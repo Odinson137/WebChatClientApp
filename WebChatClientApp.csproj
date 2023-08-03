@@ -12,9 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Controllers\" />
-    <Folder Include="Views\" />
+    <Folder Include="Data\ServerContext\" />
   </ItemGroup>
 
 </Project>
