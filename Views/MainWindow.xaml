@@ -56,7 +56,7 @@
                 <TextBox x:Name="TextBoxId" Height="20" Width="100"/>
                 <Button Margin="0 20" Width="150" Grid.Column="2" Height="20" Background="Green" Foreground="White" Command="{Binding ClickMouse}">Click</Button>
 
-            </StackPanel>
+            </StackPanel> 
             
 
         </Grid>
