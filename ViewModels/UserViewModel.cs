@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,40 +13,75 @@ using WebChatClientApp.Models;
 
 namespace WebChatClientApp.ViewModels
 {
-    public class UserViewModel
+    public class UserViewModel : INotifyPropertyChanged
     {
         private ServerContext<UserModel> _context;
 
-        public UserModel User { get; set; }
-        public ICollection<UserModel> Users { get; set; } // временно
+        private UserModel user;
+        public UserModel User
+        {
+            get => user;
+            set
+            {
+                user = value;
+                OnPropertyChanged("User");
+            }
+        }
+
+        private ObservableCollection<UserModel> users;
+        public ObservableCollection<UserModel> Users
+        {
+            get => users;
+            set
+            {
+                users = value;
+                OnPropertyChanged("Users");
+            }
+        }
+        // временно
         public UserViewModel()
         {
-            //_context = new ServerContext<UserModel>();
+            _context = new ServerContext<UserModel>();
         }
 
-        private void CreateUserModel()
+        public void AddUserModel(UserModel model)
         {
-            User = new UserModel()
-            {
-                //Name = 
-            };
+            User = model;
         }
 
-
-        private Command clickMouse;
-        public Command ClickMouse
+        private Command getUser;
+        public Command GetUser
         {
             get 
             {
-                return clickMouse ?? (clickMouse = new Command(obj =>
+                return getUser ?? (getUser = new Command(obj =>
                 {
-                    MessageBox.Show("as");
+                    _context.CreateRequest("User", (string)obj, AddUserModel);
                 }));
             }
-            set
+        }
+
+        public void GetUsers(ICollection<UserModel> models)
+        {
+            Users = new ObservableCollection<UserModel>(models);
+        }
+
+        private Command getUsers;
+        public Command GetAllUsers
+        {
+            get
             {
-                clickMouse.CanExecute(true);
+                return getUsers ?? (getUsers = new Command(obj =>
+                {
+                    _context.CreateRequest("User", GetUsers);
+                }));
             }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
     }
 }
