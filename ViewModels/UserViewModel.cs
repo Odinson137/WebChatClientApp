@@ -13,12 +13,13 @@ using System.Windows.Threading;
 using WebChatClientApp.Commands;
 using WebChatClientApp.Data;
 using WebChatClientApp.Models;
+using static WebChatClientApp.ViewModels.UserViewModel;
 
 namespace WebChatClientApp.ViewModels
 {
-    public class UserViewModel : INotifyPropertyChanged
+    public class UserViewModel : BaseViewModel
     {
-        private ServerContext<UserModel> _context;
+        private ServerContext _context;
 
         private readonly HubConnection connection;
 
@@ -33,6 +34,17 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
+        private string page1Parameter;
+        public string Page1Parameter
+        {
+            get { return page1Parameter; }
+            set
+            {
+                page1Parameter = value;
+                OnPropertyChanged(nameof(Page1Parameter));
+            }
+        }
+
         private ObservableCollection<UserModel> users;
         public ObservableCollection<UserModel> Users
         {
@@ -44,98 +56,100 @@ namespace WebChatClientApp.ViewModels
             }
         }
         // временно
+
         public UserViewModel()
         {
-            _context = new ServerContext<UserModel>();
+            _context = new ServerContext();
+
+            _context.GetRequest<UserModel>("User", CreateUserModel);
 
             // создаем подключение к хабу
-            connection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:7078/chat")
-                .Build();
+            //connection = new HubConnectionBuilder()
+            //    .WithUrl("https://localhost:7078/chat")
+            //    .Build();
 
-            connection.On<string, string>("Receive", OnReceiveMessage);
+            ////connection.On<string>("ReceiveUserId", ReceiveUserId);
+            //connection.On<string>("ReceiveMessage", OnReceiveMessage);
         }
 
-        private void OnReceiveMessage(string message, string a)
+        public delegate void UserViewModelDelegate();
+
+        private void CreateUserModel(ICollection<UserModel> users)
+        {
+            Users = new ObservableCollection<UserModel>(users);
+        }
+
+        //private void ReceiveUserId(string message)
+        //{
+        //    userConnectedId = message;
+        //}
+
+        private void OnReceiveMessage(string message)
         {
             MessageBox.Show(message);
         }
 
-        // обработчик загрузки окна
 
 
-        public void AddUserModel(UserModel model)
-        {
-            User = model;
-        }
-
-        private Command getUser;
-        public Command GetUser
-        {
-            get 
-            {
-                return getUser ?? (getUser = new Command(obj =>
-                {
-                    try
-                    {
-                        // подключемся к хабу
-                        connection.StartAsync();
-                        MessageBox.Show("Вы вошли в чат");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
-                }));
-            }
-        }
-
-        public void GetUsers(ICollection<UserModel> models)
-        {
-            Users = new ObservableCollection<UserModel>(models);
-        }
-
-        private Command getUsers;
-        public Command GetAllUsers
-        {
-            get
-            {
-                return getUsers ?? (getUsers = new Command(obj =>
-                {
-                    SendMessageAsync("asdasd");
-                }));
-            }
-        }
-
-        private async Task SendMessageAsync(string message)
-        {
-            try
-            {
-                await connection.SendAsync("Send", message, "asd");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка отправки сообщения: {ex.Message}");
-            }
-        }
-
-        //private async void SendMessageAsync(string message)
+        //public void AddUserModel(UserModel model)
         //{
-        //    try
+        //    User = model;
+        //}
+
+        //private Command getUser;
+        //public Command GetUser
+        //{
+        //    get 
         //    {
-        //        // отправка сообщения
-        //        await connection.InvokeAsync("SendMessageCliend", "Asdasd");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.ToString());
+        //        return getUser ?? (getUser = new Command(obj =>
+        //        {
+        //            try
+        //            {
+        //                // подключемся к хабу
+        //                connection.StartAsync();
+        //                MessageBox.Show("Вы вошли в чат");
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                MessageBox.Show(ex.Message);
+        //            }
+        //        }));
         //    }
         //}
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName] string prop = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        }
+        //public void GetUsers(ICollection<UserModel> models)
+        //{
+        //    Users = new ObservableCollection<UserModel>(models);
+        //}
+
+        //private Command getUsers;
+        //public Command GetAllUsers
+        //{
+        //    get
+        //    {
+        //        return getUsers ?? (getUsers = new Command(obj =>
+        //        {
+        //            SendMessageAsync("asdasd");
+        //        }));
+        //    }
+        //}
+
+        //private async Task SendMessageAsync(string message)
+        //{
+        //    try
+        //    {
+        //        await connection.SendAsync("Send", "asd");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"Ошибка отправки сообщения: {ex.Message}");
+        //    }
+        //}
+
+        //public event PropertyChangedEventHandler PropertyChanged;
+        //public void OnPropertyChanged([CallerMemberName] string prop = "")
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        //}
     }
 }

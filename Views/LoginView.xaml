@@ -1,0 +1,134 @@
+﻿<UserControl x:Class="WebChatClientApp.Views.LoginView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WebChatClientApp.Views" xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             mc:Ignorable="d" 
+             >
+
+
+    <UserControl.DataContext>
+        <controllers:UserViewModel/>
+    </UserControl.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.Background>
+                <SolidColorBrush Color="{StaticResource BlackColor}"/>
+            </Grid.Background>
+        </Grid>
+        <Grid>
+            <Grid HorizontalAlignment="Right">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+      
+                <Grid Grid.Column="0" HorizontalAlignment="Right" Width="0.2" Background="Gray"></Grid>
+                <Grid Grid.Column="1" Width="50">
+                    <Ellipse Width="10" Height="10" Stroke="White">
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="{StaticResource BlackColor}"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </Grid>
+                <Grid Width="50" Grid.Column="2">
+                    <Ellipse Width="10" Height="10" Stroke="White"></Ellipse>
+                </Grid>
+                <Grid Width="50" Grid.Column="3" >
+                    <Ellipse Width="10" Height="10" Stroke="White" Cursor="Hand" MouseDown="Closed_Click">
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="{StaticResource BlackColor}"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </Grid>
+            </Grid>
+
+            <StackPanel Orientation="Horizontal">
+                
+                <Border Width="60" Height="35"
+                        BorderBrush="Gray" VerticalAlignment="Bottom">
+                    <Border.Background>
+                        <SolidColorBrush Color="#353535"/>
+                    </Border.Background>
+                    <TextBlock FontSize="14" Foreground="White" VerticalAlignment="Center" 
+                               HorizontalAlignment="Center">Home</TextBlock>
+                </Border>
+                <Border Width="30">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
+                    </Border>
+            </StackPanel>
+        </Grid>
+
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70*"/>
+                <ColumnDefinition Width="30*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Margin="100 0 0 0" Width="300" Height="400" 
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+  
+
+                <TextBlock Text="{Binding Page1Parameter, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+
+                <TextBlock FontSize="24" Foreground="White"
+                               Text="Add account:" TextAlignment="Center"/>
+                <TextBox Margin="0 10 0 0" FontSize="24" Text="Name" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
+                             BorderThickness="0 0 0 2" BorderBrush="White"
+                             Background="{x:Null}" Foreground="White">
+                    <TextBox.SelectionTextBrush>
+                        <SolidColorBrush Color="#FF0E9EB7" Opacity="0"/>
+                    </TextBox.SelectionTextBrush>
+                </TextBox>
+
+                <TextBox Margin="0 5 0 0" FontSize="24" Text="Password" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
+                             BorderThickness="0 0 0 2" BorderBrush="White"
+                             Background="{x:Null}" Foreground="White">
+                    <TextBox.SelectionTextBrush>
+                        <SolidColorBrush Color="#FF0E9EB7" Opacity="0"/>
+                    </TextBox.SelectionTextBrush>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+                <StackPanel.Background>
+                    <SolidColorBrush Color="{StaticResource BlackColor}" Opacity="0.7"/>
+                </StackPanel.Background>
+                <TextBlock FontSize="22" HorizontalAlignment="Center" 
+                               Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center"
+                               Text="Log in to the added account:" TextAlignment="Center"/>
+
+                <ListBox ItemsSource="{Binding Users}" Background="{x:Null}" x:Name="ListBox"
+                             BorderBrush="{x:Null}" Foreground="#FFFFF9F9"
+                             SelectedItem="{Binding User}" HorizontalAlignment="Center">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Margin="0 0 20 0" FontSize="18" Foreground="{StaticResource LightBlueColorBrush}"  Text="{Binding Name}"/>
+                                <TextBlock FontSize="18" Foreground="White" Text="{Binding LastName}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction 
+                                    Command="{Binding DataContext.SwitchToPage2Command, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                    CommandParameter="{Binding ElementName=ListBox, Path=SelectedItem}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ListBox>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+
+</UserControl>

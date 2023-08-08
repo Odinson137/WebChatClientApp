@@ -1,34 +1,17 @@
-﻿<Window x:Class="WebChatClientApp.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WebChatClientApp"
-        xmlns:View="clr-namespace:WebChatClientApp.Views"
-        xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels"
-        WindowStyle="None" Background="Transparent" AllowsTransparency="True"
-        mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="ICycle" Height="600" Width="800"
-        MouseDown="Window_MouseDown"
-        xmlns:views="clr-namespace:WebChatClientApp.Views"
-        xmlns:viewsmodel="clr-namespace:WebChatClientApp.ViewModels"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
+﻿<UserControl  x:Class="WebChatClientApp.Views.ChatMenuView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WebChatClientApp.Views"
+      xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels"
+      mc:Ignorable="d">
 
-    <Window.DataContext>
-        <controllers:MainViewModel/>
-    </Window.DataContext>
-
-    <Window.Resources>
-        <DataTemplate DataType="{x:Type viewsmodel:ChatMenuViewModel}">
-            <views:ChatMenuView/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewsmodel:UserViewModel}">
-            <views:LoginView/>
-        </DataTemplate>
-    </Window.Resources>
+    <UserControl.DataContext>
+        <controllers:ChatMenuViewModel/>
+    </UserControl.DataContext>
 
     <Grid>
-
         <Border CornerRadius="5">
 
             <Border.Background>
@@ -48,10 +31,6 @@
                         <SolidColorBrush Color="{StaticResource BlackColor}"/>
                     </Grid.Background>
                 </Grid>
-                
-                
-
-
                 <Grid>
                     <Grid HorizontalAlignment="Right">
                         <Grid.ColumnDefinitions>
@@ -72,7 +51,7 @@
                             <Ellipse Width="10" Height="10" Stroke="White"></Ellipse>
                         </Grid>
                         <Grid Width="50" Grid.Column="3" >
-                            <Ellipse Width="10" Height="10" Stroke="White" Cursor="Hand" MouseDown="Closed_Click">
+                            <Ellipse Width="10" Height="10" Stroke="White" Cursor="Hand">
                                 <Ellipse.Fill>
                                     <SolidColorBrush Color="{StaticResource BlackColor}"/>
                                 </Ellipse.Fill>
@@ -152,16 +131,9 @@
                     </StackPanel>
                 </Grid>-->
 
-
-
-                <Grid Grid.Row="0" Grid.RowSpan="2">
-                    <ContentControl Content="{Binding CurrentPage}" />
-                </Grid>
-
-                <!--<ContentControl Grid.Row="0" Grid.RowSpan="2" Content="{Binding CurrentPage}"/>-->
             </Grid>
         </Border>
 
-        
+        <ContentControl Content="{Binding SelectedViewModel}"/>
     </Grid>
-</Window>
+</UserControl>
