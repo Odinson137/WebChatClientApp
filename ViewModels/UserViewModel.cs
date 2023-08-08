@@ -90,7 +90,6 @@ namespace WebChatClientApp.ViewModels
         }
 
 
-
         //public void AddUserModel(UserModel model)
         //{
         //    User = model;

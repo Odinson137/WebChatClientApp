@@ -35,11 +35,5 @@ namespace WebChatClientApp.Views
         {
             InitializeComponent();
         }
-
-        public ChatMenuView(string v)
-        {
-            MessageBox.Show(v);
-            InitializeComponent();
-        }
     }
 }

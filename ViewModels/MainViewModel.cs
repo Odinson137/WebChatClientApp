@@ -106,6 +106,7 @@ namespace WebChatClientApp.ViewModels
             {
                 return getUser ?? (getUser = new Command(obj =>
                 {
+                    User = (UserModel)obj;
                     SwitchToPage2();
                     //try
                     //{
