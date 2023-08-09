@@ -22,7 +22,7 @@ namespace WebChatClientApp.Data
         //
         // Для получения моделей из базы данных
         // adress: ../Controller/
-        public async void GetRequest<T>(string controller, GetModel<T> getModel)
+        public async void GetRequest<G>(string controller, GetModel<G> getModel)
         {
             string apiUrl = $"{url}/api/{controller}";
             try
@@ -35,40 +35,12 @@ namespace WebChatClientApp.Data
             }
         }
 
-        public async void GetRequest<T>(string controller, string id, GetModel<T> getModel)
+        public async void GetRequest<G>(string controller, object id, GetModel<G> getModel)
         {
             string apiUrl = $"{url}/api/{controller}/{id}";
             try
             {
                 await SendGetRequest(apiUrl, getModel);
-            }
-            catch
-            {
-                MessageBox.Show("Error");
-            }
-        }
-
-        // Для получения коллекций из базы данных
-        // adress: ../Controller/id
-        public async void GetRequest<T>(string controller, GetCollectinModel<T> getCollectinModel)
-        {
-            string apiUrl = $"{url}/api/{controller}";
-            try
-            {
-                await SendGetRequest(apiUrl, getCollectinModel);
-            }
-            catch
-            {
-                MessageBox.Show("Error");
-            }
-        }
-
-        public async void GetRequest<T>(string controller, string id, GetCollectinModel<T> getCollectinModel)
-        {
-            string apiUrl = $"{url}/api/{controller}/{id}";
-            try
-            {
-                await SendGetRequest(apiUrl, getCollectinModel);
             }
             catch
             {
@@ -79,13 +51,12 @@ namespace WebChatClientApp.Data
         // Делегат, который передает значения модели со стороны сервера из данного класса в тот класс, который его реализует
         // Позволяет реализующим классам абсрагироваться от http запросов
         public delegate void GetModel<T>(T model);
-        public delegate void GetCollectinModel<T>(ICollection<T> model);
-
+ 
         // Метод для получения результов от сервера по запросу
         // Имеет две реализации для моделей и для коллекций
         //
         // Должен принимать делегат для записи значений из серверных моделей в модели на стороне клиента
-        private async Task SendGetRequest<T>(string apiUrl, GetModel<T> getModel)
+        private static async Task SendGetRequest<G>(string apiUrl, GetModel<G> getModel)
         {
             using (HttpClient httpClient = new HttpClient())
             {
@@ -98,7 +69,7 @@ namespace WebChatClientApp.Data
                     response.EnsureSuccessStatusCode();
 
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    T result = JsonConvert.DeserializeObject<T>(responseBody);
+                    G result = JsonConvert.DeserializeObject<G>(responseBody);
                     getModel(result);
                 }
                 catch (HttpRequestException ex)
@@ -114,44 +85,10 @@ namespace WebChatClientApp.Data
             }
         }
 
-        // Должен принимать делегат для записи значений из серверных коллекций в коллекции на стороне клиента
-        private async Task SendGetRequest<T>(string apiUrl, GetCollectinModel<T> getCollectionModel)
-        {
-            using (HttpClient httpClient = new HttpClient())
-            {
-                try
-                {
-                    httpClient.DefaultRequestHeaders.Accept.Clear();
-                    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                    HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
-                    response.EnsureSuccessStatusCode();
-
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    ICollection<T> result = JsonConvert.DeserializeObject<ICollection<T>>(responseBody);
-                    //foreach ()
-                    getCollectionModel(result);
-
-                }
-                catch (HttpRequestException ex)
-                {
-                    MessageBox.Show("Ошибка при отправке запроса: " + ex.Message);
-                    throw new Exception("Ошибка при отправке запроса: " + ex.Message);
-                }
-                catch (JsonException ex)
-                {
-                    MessageBox.Show("Ошибка при обработке JSON: " + ex.Message);
-                    throw new Exception("Ошибка при обработке JSON: " + ex.Message);
-                }
-            }
-        }
-
-
-
         // Метод для создания запросов к серверу
         // Для отправки данных
         // adress: ../Controller/
-        public async void PostRequest<P>(string controller, P getModel)
+        public static async void PostRequest<P>(string controller, P getModel)
         {
             string apiUrl = $"{url}/api/{controller}";
             try
@@ -165,7 +102,7 @@ namespace WebChatClientApp.Data
         }
 
         // Метод для отправки данных на сервер
-        public async Task SendPostRequest<P>(string apiUrl, P getModel)
+        public static async Task SendPostRequest<P>(string apiUrl, P getModel)
         {
             using (HttpClient httpClient = new HttpClient())
             {
