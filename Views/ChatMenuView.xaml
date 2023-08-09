@@ -12,132 +12,112 @@
     </UserControl.DataContext>
 
     <Grid>
-        <Border CornerRadius="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
 
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0.2, 1" EndPoint="0.5, 0">
-                    <GradientStop Color="{StaticResource LightPurpleColor}" Offset="0"/>
-                    <GradientStop Color="{StaticResource LightBlueColor}" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
+            <Grid Grid.Column="0" Grid.Row="0">
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="60" Height="35"
+                        BorderBrush="Gray" VerticalAlignment="Bottom">
+                        <Border.Background>
+                            <SolidColorBrush Color="#353535"/>
+                        </Border.Background>
+                        <TextBlock FontSize="14" Foreground="White" VerticalAlignment="Center" 
+                               HorizontalAlignment="Center">Home</TextBlock>
+                    </Border>
+                    <Border Width="30">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
 
-            <Grid >
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30*"/>
+                <ColumnDefinition Width="40*"/>
+                <ColumnDefinition Width="30*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="50"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <Grid>
-                    <Grid.Background>
-                        <SolidColorBrush Color="{StaticResource BlackColor}"/>
-                    </Grid.Background>
-                </Grid>
-                <Grid>
-                    <Grid HorizontalAlignment="Right">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0" HorizontalAlignment="Right" Width="0.2" Background="Gray"></Grid>
-                        <Grid Grid.Column="1" Width="50">
-                            <Ellipse Width="10" Height="10" Stroke="White">
-                                <Ellipse.Fill>
-                                    <SolidColorBrush Color="{StaticResource BlackColor}"/>
-                                </Ellipse.Fill>
-                            </Ellipse>
-                        </Grid>
-                        <Grid Width="50" Grid.Column="2">
-                            <Ellipse Width="10" Height="10" Stroke="White"></Ellipse>
-                        </Grid>
-                        <Grid Width="50" Grid.Column="3" >
-                            <Ellipse Width="10" Height="10" Stroke="White" Cursor="Hand">
-                                <Ellipse.Fill>
-                                    <SolidColorBrush Color="{StaticResource BlackColor}"/>
-                                </Ellipse.Fill>
-                            </Ellipse>
-                        </Grid>
-                    </Grid>
+            </Grid>
 
-                    <StackPanel Orientation="Horizontal">
-                        <!--<Border Width="60" Height="35"
-                        BorderBrush="Gray" VerticalAlignment="Bottom">
-                            <Border.Background>
-                                <SolidColorBrush Color="#353535"/>
-                            </Border.Background>
-                            <TextBlock FontSize="14" Foreground="White" VerticalAlignment="Center" 
-                               HorizontalAlignment="Center">Home</TextBlock>
-                        </Border>-->
-                        <!--<Border Width="30">
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
-                    </Border>-->
-                    </StackPanel>
-                </Grid>
+            <Grid Grid.Column="0" Margin="10 50">
+                <ListView ItemsSource="{Binding Chats}" SelectedItem="{Binding Chat}" 
+                          BorderBrush="#FF4E67AF" FontSize="20" Background="{x:Null}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="Right">
+                                <TextBlock TextAlignment="Right" Foreground="White" Text="{Binding Title}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+            
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
 
-                <!--<Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="70*"/>
-                        <ColumnDefinition Width="30*"/>
-                    </Grid.ColumnDefinitions>
+                <ListView ItemsSource="{Binding Messages}" Margin="0 0 0 50" Grid.Row="1" ScrollViewer.CanContentScroll="True" Foreground="White">
+                    <ListView.BorderBrush>
+                        <SolidColorBrush Color="White" Opacity="0"/>
+                    </ListView.BorderBrush>
+                    <ListView.Background>
+                        <SolidColorBrush Color="#FF4B7188" Opacity="0.5"/>
+                    </ListView.Background>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="24" Text="{Binding Text}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <!-- Здесь добавьте столбцы и настройки для отображения сообщений -->
+                </ListView>
+            </Grid>
 
-                    <StackPanel Grid.Column="0" Margin="100 0 0 0" Width="300" Height="400" 
-                            HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock FontSize="24" Foreground="White"
-                               Text="Add account:" TextAlignment="Center"/>
-                        <TextBox Margin="0 10 0 0" FontSize="24" Text="Name" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
-                             BorderThickness="0 0 0 2" BorderBrush="White"
-                             Background="{x:Null}" Foreground="White">
-                            <TextBox.SelectionTextBrush>
-                                <SolidColorBrush Color="#FF0E9EB7" Opacity="0"/>
-                            </TextBox.SelectionTextBrush>
-                        </TextBox>
-
-                        <TextBox Margin="0 5 0 0" FontSize="24" Text="Password" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
-                             BorderThickness="0 0 0 2" BorderBrush="White"
-                             Background="{x:Null}" Foreground="White">
-                            <TextBox.SelectionTextBrush>
-                                <SolidColorBrush Color="#FF0E9EB7" Opacity="0"/>
-                            </TextBox.SelectionTextBrush>
-                        </TextBox>
-                    </StackPanel>
-                    <StackPanel Grid.Column="1">
-                        <StackPanel.Background>
-                            <SolidColorBrush Color="{StaticResource BlackColor}" Opacity="0.7"/>
-                        </StackPanel.Background>
-                        <TextBlock FontSize="22" HorizontalAlignment="Center" 
-                               Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center"
-                               Text="Log in to the added account:" TextAlignment="Center"/>
-
-                        <ListBox ItemsSource="{Binding Users}" Background="{x:Null}" x:Name="ListBox"
-                             BorderBrush="{x:Null}" Foreground="#FFFFF9F9"
-                             SelectedItem="{Binding User}" HorizontalAlignment="Center">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <TextBlock Margin="0 0 20 0" FontSize="18" Foreground="{StaticResource LightBlueColorBrush}"  Text="{Binding Name}"/>
-                                        <TextBlock FontSize="18" Foreground="White" Text="{Binding LastName}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-
-                            --><!--<i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction 
-                                    Command="{Binding SelectionChanged}"
-                                    CommandParameter="{Binding ElementName=ListBox, Path=SelectedItem}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>--><!--
-                        </ListBox>
-                    </StackPanel>
-                </Grid>-->
+            <Grid Grid.Column="2" Margin="10 50" VerticalAlignment="Top">
+                <StackPanel>
+                    <TextBlock HorizontalAlignment="Center" Foreground="White" FontSize="20">Input message</TextBlock>
+                    <TextBox x:Name="MessageBox" Foreground="White" Height="50" SelectionBrush="#FF2A54FD" SelectionTextBrush="#FFEC8EE8">
+                        <TextBox.Background>
+                            <SolidColorBrush Color="Black" Opacity="0"/>
+                        </TextBox.Background>
+                    </TextBox>
+                    <Button Content="Send" Foreground="White" Background="#FF2BA3B3" 
+                            Command="{Binding SendMessage}" CommandParameter="{Binding ElementName=MessageBox, Path=Text}"/>
+                </StackPanel>
 
             </Grid>
-        </Border>
+
+            <!--<Image Width="200" Source="/Views/Opera Снимок_2023-08-09_154429_looka.com-benzin-preview.png" ></Image>-->
+            <!--<Button></Button>-->
+            <!--<ListView>
+                
+            </ListView>-->
+        </Grid>
 
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="Loaded">
                 <i:InvokeCommandAction 
-                    Command="{Binding Command}"
+                    Command="{Binding LoadingCommand}"
                     CommandParameter="{Binding DataContext.User, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                     />
             </i:EventTrigger>

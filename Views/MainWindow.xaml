@@ -22,7 +22,7 @@
         <DataTemplate DataType="{x:Type viewsmodel:ChatMenuViewModel}">
             <views:ChatMenuView/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewsmodel:UserViewModel}">
+        <DataTemplate DataType="{x:Type viewsmodel:LoginViewModel}">
             <views:LoginView/>
         </DataTemplate>
     </Window.Resources>
@@ -48,9 +48,6 @@
                         <SolidColorBrush Color="{StaticResource BlackColor}"/>
                     </Grid.Background>
                 </Grid>
-                
-                
-
 
                 <Grid>
                     <Grid HorizontalAlignment="Right">
@@ -79,86 +76,10 @@
                             </Ellipse>
                         </Grid>
                     </Grid>
-
-                    <StackPanel Orientation="Horizontal">
-                        <!--<Border Width="60" Height="35"
-                        BorderBrush="Gray" VerticalAlignment="Bottom">
-                            <Border.Background>
-                                <SolidColorBrush Color="#353535"/>
-                            </Border.Background>
-                            <TextBlock FontSize="14" Foreground="White" VerticalAlignment="Center" 
-                               HorizontalAlignment="Center">Home</TextBlock>
-                        </Border>-->
-                        <!--<Border Width="30">
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
-                    </Border>-->
-                    </StackPanel>
                 </Grid>
-
-                <!--<Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="70*"/>
-                        <ColumnDefinition Width="30*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0" Margin="100 0 0 0" Width="300" Height="400" 
-                            HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock FontSize="24" Foreground="White"
-                               Text="Add account:" TextAlignment="Center"/>
-                        <TextBox Margin="0 10 0 0" FontSize="24" Text="Name" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
-                             BorderThickness="0 0 0 2" BorderBrush="White"
-                             Background="{x:Null}" Foreground="White">
-                            <TextBox.SelectionTextBrush>
-                                <SolidColorBrush Color="#FF0E9EB7" Opacity="0"/>
-                            </TextBox.SelectionTextBrush>
-                        </TextBox>
-
-                        <TextBox Margin="0 5 0 0" FontSize="24" Text="Password" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
-                             BorderThickness="0 0 0 2" BorderBrush="White"
-                             Background="{x:Null}" Foreground="White">
-                            <TextBox.SelectionTextBrush>
-                                <SolidColorBrush Color="#FF0E9EB7" Opacity="0"/>
-                            </TextBox.SelectionTextBrush>
-                        </TextBox>
-                    </StackPanel>
-                    <StackPanel Grid.Column="1">
-                        <StackPanel.Background>
-                            <SolidColorBrush Color="{StaticResource BlackColor}" Opacity="0.7"/>
-                        </StackPanel.Background>
-                        <TextBlock FontSize="22" HorizontalAlignment="Center" 
-                               Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center"
-                               Text="Log in to the added account:" TextAlignment="Center"/>
-
-                        <ListBox ItemsSource="{Binding Users}" Background="{x:Null}" x:Name="ListBox"
-                             BorderBrush="{x:Null}" Foreground="#FFFFF9F9"
-                             SelectedItem="{Binding User}" HorizontalAlignment="Center">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <TextBlock Margin="0 0 20 0" FontSize="18" Foreground="{StaticResource LightBlueColorBrush}"  Text="{Binding Name}"/>
-                                        <TextBlock FontSize="18" Foreground="White" Text="{Binding LastName}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-
-                            --><!--<i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction 
-                                    Command="{Binding SelectionChanged}"
-                                    CommandParameter="{Binding ElementName=ListBox, Path=SelectedItem}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>--><!--
-                        </ListBox>
-                    </StackPanel>
-                </Grid>-->
-
-
-
                 <Grid Grid.Row="0" Grid.RowSpan="2">
                     <ContentControl Content="{Binding CurrentPage}" />
                 </Grid>
-
-                <!--<ContentControl Grid.Row="0" Grid.RowSpan="2" Content="{Binding CurrentPage}"/>-->
             </Grid>
         </Border>
 

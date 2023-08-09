@@ -10,14 +10,6 @@ using WebChatClientApp.Views;
 
 namespace WebChatClientApp.ViewModels
 {
-    public class ParameterService
-    {
-        public string Page1Parameter { get; set; }
-        public int Page2Parameter { get; set; }
-    }
-
-
-
     class MainViewModel : BaseViewModel
     {
         private ServerContext _context;
@@ -29,9 +21,6 @@ namespace WebChatClientApp.ViewModels
             set
             {
                 user = value;
-                //SelectedViewModel = new ChatMenuViewModel();
-                //SelectedViewModel.Parameter = user;
-                //OnPropertyChanged("SelectedViewModel");
             } 
         }
 
@@ -47,7 +36,6 @@ namespace WebChatClientApp.ViewModels
         }
 
         private UserControl currentPage;
-
         public UserControl CurrentPage
         {
             get { return currentPage; }
@@ -58,46 +46,21 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-
-        private void CreateUserModel(ICollection<UserModel> users)
+        private void CreateUserModel(ObservableCollection<UserModel> users)
         {
-            Users = new ObservableCollection<UserModel>(users);
+            Users = users;
         }
 
-        private string page1Parameter;
-        private int page2Parameter;
-
-        public string Page1Parameter
-        {
-            get { return page1Parameter; }
-            set
-            {
-                page1Parameter = value;
-                OnPropertyChanged(nameof(Page1Parameter));
-            }
-        }
-        public ParameterService ParameterService { get; } = new ParameterService();
         public MainViewModel()
         {
-            //SwitchToPage1Command = new Command(SwitchToPage1);
-            //SwitchToPage2Command = new Command(SwitchToPage2);
-
             _context = new ServerContext();
 
-            _context.GetRequest<UserModel>("User", CreateUserModel);
+            _context.GetRequest<ObservableCollection<UserModel>>("User", CreateUserModel);
 
-            LoginView page1 = new LoginView();
-            //ParameterService.Page1Parameter = "yura";
-            //page1.Parameter = SwitchToPage2;
+            //LoginView page1 = new LoginView();
+            ChatMenuView page1 = new ChatMenuView();
             CurrentPage = page1;
-            //SelectedViewModel = new BaseViewModel();
         }
-
-        //// Команда для переключения на страницу 1
-        //public ICommand SwitchToPage1Command { get; }
-
-        //// Команда для переключения на страницу 2
-        //public ICommand SwitchToPage2Command { get; }
 
         private Command getUser;
         public Command SwitchToPage2Command
@@ -107,7 +70,8 @@ namespace WebChatClientApp.ViewModels
                 return getUser ?? (getUser = new Command(obj =>
                 {
                     User = (UserModel)obj;
-                    SwitchToPage2();
+                    ChatMenuView page2 = new ChatMenuView();
+                    CurrentPage = page2;
                     //try
                     //{
                     //    // подключемся к хабу
@@ -120,20 +84,6 @@ namespace WebChatClientApp.ViewModels
                     //}
                 }));
             }
-        }
-
-        private void SwitchToPage1()
-        {
-            LoginView page1 = new LoginView();
-            //page1.Parameter = "Some data for Page 1"; // Установка параметра для страницы 1
-            CurrentPage = page1;
-        }
-
-        private void SwitchToPage2()
-        {
-            ChatMenuView page2 = new ChatMenuView();
-            //page2.Parameter = User; // Установка параметра для страницы 2
-            CurrentPage = page2;
         }
     }
 }

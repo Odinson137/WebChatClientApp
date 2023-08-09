@@ -13,15 +13,12 @@ using System.Windows.Threading;
 using WebChatClientApp.Commands;
 using WebChatClientApp.Data;
 using WebChatClientApp.Models;
-using static WebChatClientApp.ViewModels.UserViewModel;
 
 namespace WebChatClientApp.ViewModels
 {
-    public class UserViewModel : BaseViewModel
+    public class LoginViewModel : BaseViewModel
     {
         private ServerContext _context;
-
-        private readonly HubConnection connection;
 
         private UserModel user;
         public UserModel User
@@ -55,40 +52,20 @@ namespace WebChatClientApp.ViewModels
                 OnPropertyChanged("Users");
             }
         }
-        // временно
 
-        public UserViewModel()
+        public LoginViewModel()
         {
             _context = new ServerContext();
 
-            _context.GetRequest<UserModel>("User", CreateUserModel);
-
-            // создаем подключение к хабу
-            //connection = new HubConnectionBuilder()
-            //    .WithUrl("https://localhost:7078/chat")
-            //    .Build();
-
-            ////connection.On<string>("ReceiveUserId", ReceiveUserId);
-            //connection.On<string>("ReceiveMessage", OnReceiveMessage);
+            _context.GetRequest<ObservableCollection<UserModel>>("User", CreateUserModel);
         }
 
         public delegate void UserViewModelDelegate();
 
-        private void CreateUserModel(ICollection<UserModel> users)
+        private void CreateUserModel(ObservableCollection<UserModel> users)
         {
-            Users = new ObservableCollection<UserModel>(users);
+            Users = users;
         }
-
-        //private void ReceiveUserId(string message)
-        //{
-        //    userConnectedId = message;
-        //}
-
-        private void OnReceiveMessage(string message)
-        {
-            MessageBox.Show(message);
-        }
-
 
         //public void AddUserModel(UserModel model)
         //{

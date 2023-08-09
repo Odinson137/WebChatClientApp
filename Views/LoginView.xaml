@@ -9,7 +9,7 @@
 
 
     <UserControl.DataContext>
-        <controllers:UserViewModel/>
+        <controllers:LoginViewModel/>
     </UserControl.DataContext>
 
     <Grid>
@@ -61,9 +61,9 @@
                     <TextBlock FontSize="14" Foreground="White" VerticalAlignment="Center" 
                                HorizontalAlignment="Center">Home</TextBlock>
                 </Border>
-                <Border Width="30">
+                <!--<Border Width="30">
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
-                    </Border>
+                    </Border>-->
             </StackPanel>
         </Grid>
 
@@ -76,7 +76,8 @@
 
             <StackPanel Grid.Column="0" Margin="100 0 0 0" Width="300" Height="400" 
                             HorizontalAlignment="Center" VerticalAlignment="Center">
-  
+
+                
 
                 <TextBlock Text="{Binding Page1Parameter, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
 
