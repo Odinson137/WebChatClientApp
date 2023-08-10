@@ -11,6 +11,8 @@ namespace WebChatClientApp.Models
     public class MessageModel : INotifyPropertyChanged
     {
         public int MessageID { get; set; }
+        public int UserID { get; set; }
+        public int ChatID { get; set; }
         public string Text { get; set; }
         public DateTime SendMessage { get; set; }
 

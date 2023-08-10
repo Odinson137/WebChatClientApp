@@ -88,7 +88,7 @@ namespace WebChatClientApp.Data
         // Метод для создания запросов к серверу
         // Для отправки данных
         // adress: ../Controller/
-        public static async void PostRequest<P>(string controller, P getModel)
+        public async void PostRequest<P>(string controller, P getModel)
         {
             string apiUrl = $"{url}/api/{controller}";
             try
@@ -102,7 +102,7 @@ namespace WebChatClientApp.Data
         }
 
         // Метод для отправки данных на сервер
-        public static async Task SendPostRequest<P>(string apiUrl, P getModel)
+        public async Task SendPostRequest<P>(string apiUrl, P getModel)
         {
             using (HttpClient httpClient = new HttpClient())
             {
@@ -118,7 +118,7 @@ namespace WebChatClientApp.Data
                     // Проверяем успешность запроса
                     if (response.IsSuccessStatusCode)
                     {
-                        MessageBox.Show("Сообщение успешно отправлено на сервер.");
+                        //MessageBox.Show("Сообщение успешно отправлено на сервер.");
                     }
                     else
                     {
