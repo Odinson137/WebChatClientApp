@@ -57,8 +57,10 @@ namespace WebChatClientApp.ViewModels
 
             _context.GetRequest<ObservableCollection<UserModel>>("User", CreateUserModel);
 
-            LoginView page = new LoginView();
-            //ChatMenuView page1 = new ChatMenuView();
+
+            //LoginView page = new LoginView();
+            
+            ChatMenuView page = new ChatMenuView();
             CurrentPage = page;
         }
 
@@ -72,16 +74,20 @@ namespace WebChatClientApp.ViewModels
                     User = (UserModel)obj;
                     ChatMenuView page2 = new ChatMenuView();
                     CurrentPage = page2;
-                    //try
-                    //{
-                    //    // подключемся к хабу
-                    //    connection.StartAsync();
-                    //    MessageBox.Show("Вы вошли в чат");
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    MessageBox.Show(ex.Message);
-                    //}
+                }));
+            }
+        }
+
+        private Command switchToOne;
+        public Command SwitchToPage1Command
+        {
+            get
+            {
+                return switchToOne ?? (switchToOne = new Command(obj =>
+                {
+                    MessageBox.Show("sdfsfd");
+                    LoginView page1 = new LoginView();
+                    CurrentPage = page1;
                 }));
             }
         }

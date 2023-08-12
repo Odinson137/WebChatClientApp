@@ -28,12 +28,12 @@ namespace WebChatClientApp.Data
             try
             {
                 await SendGetRequest(apiUrl, getModel);
-            }
+        }
             catch
             {
                 MessageBox.Show("Error");
             }
-        }
+}
 
         public async void GetRequest<G>(string controller, object id, GetModel<G> getModel)
         {

@@ -30,7 +30,10 @@ namespace WebChatClientApp.ViewModels
                 chat = value;
 
                 if (chat.Messages == null)
+                {
                     GetMessages();
+                    chat.Message = new MessageModel();
+                }
 
                 OnPropertyChanged("Chat");
             }
@@ -50,14 +53,14 @@ namespace WebChatClientApp.ViewModels
         public ChatMenuViewModel()
         {
             _context = new ServerContext();
-            Chat = new ChatModel();
+            //Chat = new ChatModel();
             Chats = new ObservableCollection<ChatModel>();
-            Chat.Messages = new ObservableCollection<MessageModel>();
+            //Chat.Messages = new ObservableCollection<MessageModel>();
         }
 
         private void ChatMenuFunc()
         {
-            _context.GetRequest<ObservableCollection<ChatModel>>("ChatUser", User.UserID, CreateChat);
+            _context.GetRequest<ObservableCollection<ChatModel>>("Chat", User.UserID, CreateChat);
 
             connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:7078/chat")
@@ -77,15 +80,16 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        private void Connecting()
+        private async void Connecting()
         {
             try
             {
-                connection.StartAsync();
+                await connection.StartAsync();
+                await connection.InvokeAsync("SendMessage", User.UserID);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Connecting error" + ex.Message);
             }
         }
 
@@ -117,7 +121,9 @@ namespace WebChatClientApp.ViewModels
             {
                 return loadingCommand ?? (loadingCommand = new Command(obj =>
                 {
-                    User = (UserModel)obj;
+                    //User = (UserModel)obj;
+                    User = new UserModel() { UserID = 1, Name = "Yura", LastName = "Bury", Password = "123" };
+                     
                     ChatMenuFunc();
                 }));
             }
@@ -130,15 +136,18 @@ namespace WebChatClientApp.ViewModels
             {
                 return sendMessage ?? (sendMessage = new Command(obj =>
                 {
-                    string text = (string)obj;
-                    MessageModel message = new MessageModel()
-                    {
-                        UserID = User.UserID,
-                        ChatID = Chat.ChatID,
-                        Text = text
-                    };
-                    Chat.Messages.Add(message);
-                    _context.PostRequest("Message", message);
+                    
+                    //MessageModel message = new MessageModel()
+                    //{
+                    //    UserID = User.UserID,
+                    //    ChatID = Chat.ChatID,
+                    //    Text = text
+                    //};
+                    Chat.Messages.Add(Chat.Message);
+                    Chat.Message = new MessageModel();
+                    //Chat.Message.Text = "";
+
+                    //_context.PostRequest("Message", message);
                 }));
             }
         }

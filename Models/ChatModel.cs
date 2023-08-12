@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -19,8 +20,19 @@ namespace WebChatClientApp.Models
                 OnPropertyChanged("Message");
             }
         }
-        
-        ObservableCollection<MessageModel> messages;
+
+        private ObservableCollection<UserModel> users;
+        public ObservableCollection<UserModel> Users
+        {
+            get => users;
+            set
+            {
+                users = value;
+                OnPropertyChanged("Users");
+            }
+        }
+
+        private ObservableCollection<MessageModel> messages;
         public ObservableCollection<MessageModel> Messages
         {
             get => messages;

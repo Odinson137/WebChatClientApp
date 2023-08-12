@@ -30,7 +30,6 @@
     <Grid>
 
         <Border CornerRadius="5">
-
             <Border.Background>
                 <LinearGradientBrush StartPoint="0.2, 1" EndPoint="0.5, 0">
                     <GradientStop Color="{StaticResource LightPurpleColor}" Offset="0"/>
@@ -50,6 +49,26 @@
                 </Grid>
 
                 <Grid>
+                    <StackPanel Orientation="Horizontal">
+                    <Border Width="60" Height="35"
+                        BorderBrush="Gray" VerticalAlignment="Bottom">
+                        <Border.Background>
+                            <SolidColorBrush Color="#353535"/>
+                        </Border.Background>
+                            <TextBlock FontSize="14" Foreground="White" VerticalAlignment="Center" 
+                               HorizontalAlignment="Center" Text="Home"/>
+
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction 
+                                    Command="{Binding SwitchToPage1Command}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Border>
+                    <!--<Border Width="30">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
+                    </Border>-->
+                </StackPanel>
                     <Grid HorizontalAlignment="Right">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>

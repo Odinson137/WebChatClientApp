@@ -4,17 +4,18 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WebChatClientApp.Views"
-      xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels" 
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:converters="clr-namespace:WebChatClientApp.Converters" mc:Ignorable="d">
 
     <UserControl.DataContext>
         <controllers:ChatMenuViewModel/>
     </UserControl.DataContext>
 
-    <!--<UserControl.Resources>
-        <converters:ActiveConnection x:Key="ActiveConnection"/>
-    </UserControl.Resources>-->
-    
+    <UserControl.Resources>
+        <converters:TextAlignment x:Key="TextAlignment"/>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
@@ -27,7 +28,7 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0" Grid.Row="0">
-                <StackPanel Orientation="Horizontal">
+                <!--<StackPanel Orientation="Horizontal">
                     <Border Width="60" Height="35"
                         BorderBrush="Gray" VerticalAlignment="Bottom">
                         <Border.Background>
@@ -39,15 +40,15 @@
                     <Border Width="30">
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
                     </Border>
-                </StackPanel>
+                </StackPanel>-->
             </Grid>
         </Grid>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="30*"/>
-                <ColumnDefinition Width="40*"/>
-                <ColumnDefinition Width="30*"/>
+                <ColumnDefinition Width="15*"/>
+                <ColumnDefinition Width="70*"/>
+                <ColumnDefinition Width="15*"/>
             </Grid.ColumnDefinitions>
 
             <Grid>
@@ -61,68 +62,93 @@
                 <TextBlock Text="Online" HorizontalAlignment="Center" 
                            Foreground="Green"/>
             </Grid>
-            
+
             <Grid Grid.Column="0" Margin="10 50">
                 <ListView ItemsSource="{Binding Chats}" SelectedItem="{Binding Chat}" 
                           BorderBrush="#FF4E67AF" FontSize="20" Background="{x:Null}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid HorizontalAlignment="Right">
-                                <TextBlock TextAlignment="Right" Foreground="White" Text="{Binding Title}"/>
+                                <TextBlock TextAlignment="Left" Foreground="White" Text="{Binding Title}" TextWrapping="Wrap"/>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
             </Grid>
-            
+
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-
-                <ListView DataContext="{Binding Chat}" ItemsSource="{Binding Messages}" Margin="0 0 0 50" Grid.Row="1" ScrollViewer.CanContentScroll="True" Foreground="White">
+                <ListView ItemsSource="{Binding Chat.Messages}" 
+                          Margin="10 0 10 50" Grid.Row="1" Height="Auto" Foreground="White" BorderThickness="0">
                     <ListView.BorderBrush>
                         <SolidColorBrush Color="White" Opacity="0"/>
                     </ListView.BorderBrush>
                     <ListView.Background>
                         <SolidColorBrush Color="#FF4B7188" Opacity="0.5"/>
                     </ListView.Background>
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel VerticalAlignment="Bottom"/>
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-   
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Style.Triggers>
+                                <!--<DataTrigger Binding="{Binding UserID, Converter={StaticResource TextAlignment}, ConverterParameter={Binding ElementName=UserId, Path=Text}}" Value="True">
+                                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                </DataTrigger>-->
+                                <DataTrigger Binding="{Binding DataContext.User.UserId, Converter={StaticResource TextAlignment}}" Value="True">
+                                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock FontSize="24" Text="{Binding Text}"/>
+                            <Grid>
+                                <TextBlock FontSize="24" Text="{Binding Text}" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+                            </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
             </Grid>
 
-            <Grid Grid.Column="2" Margin="10 50" VerticalAlignment="Top">
-                <StackPanel>
-                    <TextBlock HorizontalAlignment="Center" Foreground="White" FontSize="20">Input message</TextBlock>
-                    <TextBox x:Name="MessageBox" Foreground="White" Height="50" 
-                             DataContext="{Binding Chat}" Text="{Binding Message}"
-                             SelectionBrush="#FF2A54FD" SelectionTextBrush="#FFEC8EE8">
-                        <TextBox.Background>
-                            <SolidColorBrush Color="Black" Opacity="0"/>
-                        </TextBox.Background>
+            <Border Background="{StaticResource BlackColorBrush}"
+                    Grid.Column="1" VerticalAlignment="Bottom" Margin="0 0 0 50"
+                    CornerRadius="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="85*"/>
+                        <ColumnDefinition Width="15*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="MessageBox" MinHeight="58"
+                             DataContext="{Binding Chat}" Text="{Binding Message.Text, UpdateSourceTrigger=PropertyChanged}" 
+                             SelectionTextBrush="{DynamicResource LightPurpleColorBrush}"
+                             Foreground="White" FontSize="18" Background="{x:Null}" SelectionOpacity="1" 
+                             BorderBrush="{x:Null}" CaretBrush="{DynamicResource LightBlueColorBrush}"
+                             VerticalAlignment="Center" AcceptsTab="True" AutoWordSelection="True" TextWrapping="Wrap"
+                             FocusVisualStyle="{x:Null}" BorderThickness="0" Padding="5" AcceptsReturn="True" 
+                             VerticalContentAlignment="Center">
+                        <TextBox.SelectionBrush>
+                            <SolidColorBrush Color="#FFCFAAF3" Opacity="0.40"/>
+                        </TextBox.SelectionBrush>
                     </TextBox>
-                    <Button Content="Send" Foreground="White" Background="#FF2BA3B3" 
-                            Command="{Binding SendMessage}" CommandParameter="{Binding ElementName=MessageBox, Path=Text}"/>
-                </StackPanel>
 
-            </Grid>
+                    <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 10 12" Grid.Column="1" Height="32" Background="White" Width="32" CornerRadius="5">
+                        <Image Height="24" Source="/Views/icons8-отправлено-48 (1).png">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDown">
+                                    <i:InvokeCommandAction 
+                                    Command="{Binding SendMessage}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Image>
+                    </Border>
+                    <!--<Button Grid.Column="1" Content="Send" Foreground="White" Background="#FF2BA3B3" 
+                        Command="{Binding SendMessage}"/>-->
+                </Grid>
 
-            <!--<Image Width="200" Source="/Views/Opera Снимок_2023-08-09_154429_looka.com-benzin-preview.png" ></Image>-->
-            <!--<Button></Button>-->
-            <!--<ListView>
-                
-            </ListView>-->
+            </Border>
+
         </Grid>
 
         <i:Interaction.Triggers>

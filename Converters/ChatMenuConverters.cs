@@ -22,4 +22,22 @@ namespace WebChatClientApp.Converters
             return null;
         }
     }
+
+    class TextAlignment : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            //if ((string)value == (string)parameter)
+            //{
+            //    return true;
+            //}
+            return true;
+
+        }
+
+        public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
 }

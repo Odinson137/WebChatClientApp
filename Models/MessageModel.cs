@@ -13,8 +13,18 @@ namespace WebChatClientApp.Models
         public int MessageID { get; set; }
         public int UserID { get; set; }
         public int ChatID { get; set; }
-        public string Text { get; set; }
-        public DateTime SendMessage { get; set; }
+
+        private string text;
+        public string Text
+        {
+            get => text;
+            set
+            {
+                text = value;
+                OnPropertyChanged("Text");
+            }
+        }
+        public DateTime SendTime { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
