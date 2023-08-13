@@ -19,7 +19,17 @@ namespace WebChatClientApp.ViewModels
         private HubConnection connection;
 
         private readonly ServerContext _context;
-        public UserModel User { get; set; }
+
+        private UserModel user;
+        public UserModel User
+        {
+            get => user;
+            set
+            {
+                user = value;
+                OnPropertyChanged(nameof(user));
+            }
+        }
 
         private ChatModel chat;
         public ChatModel Chat
@@ -136,18 +146,14 @@ namespace WebChatClientApp.ViewModels
             {
                 return sendMessage ?? (sendMessage = new Command(obj =>
                 {
-                    
-                    //MessageModel message = new MessageModel()
-                    //{
-                    //    UserID = User.UserID,
-                    //    ChatID = Chat.ChatID,
-                    //    Text = text
-                    //};
-                    Chat.Messages.Add(Chat.Message);
-                    Chat.Message = new MessageModel();
-                    //Chat.Message.Text = "";
+                    Chat.Message.ChatID = Chat.ChatID;
+                    Chat.Message.UserID = User.UserID;
+                    Chat.Message.SendTime = DateTime.Now;
 
-                    //_context.PostRequest("Message", message);
+                    Chat.Messages.Add(Chat.Message);
+                    _context.PostRequest("Message", Chat.Message);
+
+                    Chat.Message = new MessageModel();
                 }));
             }
         }

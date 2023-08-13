@@ -49,7 +49,7 @@
                 </Grid>
 
                 <Grid>
-                    <StackPanel Orientation="Horizontal">
+                <!--<StackPanel Orientation="Horizontal">
                     <Border Width="60" Height="35"
                         BorderBrush="Gray" VerticalAlignment="Bottom">
                         <Border.Background>
@@ -65,10 +65,10 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </Border>
-                    <!--<Border Width="30">
+                    --><!--<Border Width="30">
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
-                    </Border>-->
-                </StackPanel>
+                    </Border>--><!--
+                </StackPanel>-->
                     <Grid HorizontalAlignment="Right">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>

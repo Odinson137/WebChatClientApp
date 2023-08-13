@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace WebChatClientApp.Converters
@@ -23,21 +24,37 @@ namespace WebChatClientApp.Converters
         }
     }
 
-    class TextAlignment : IValueConverter
+    public class TextAlignment : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            //MessageBox.Show(values[0].ToString());
+            if (values[0].ToString() == values[1].ToString())
+                return HorizontalAlignment.Right;
+            return HorizontalAlignment.Left;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class TimeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            //if ((string)value == (string)parameter)
-            //{
-            //    return true;
-            //}
-            return true;
+            if (value is DateTime dateTime)
+            {
+                return dateTime.ToString("HH:mm");
+            }
 
+            return string.Empty;
         }
 
-        public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return null;
+            throw new NotImplementedException();
         }
     }
 }

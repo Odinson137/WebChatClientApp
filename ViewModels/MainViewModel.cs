@@ -85,7 +85,6 @@ namespace WebChatClientApp.ViewModels
             {
                 return switchToOne ?? (switchToOne = new Command(obj =>
                 {
-                    MessageBox.Show("sdfsfd");
                     LoginView page1 = new LoginView();
                     CurrentPage = page1;
                 }));

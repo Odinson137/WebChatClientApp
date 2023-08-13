@@ -50,21 +50,6 @@
                     </Ellipse>
                 </Grid>
             </Grid>
-
-            <StackPanel Orientation="Horizontal">
-                
-                <Border Width="60" Height="35"
-                        BorderBrush="Gray" VerticalAlignment="Bottom">
-                    <Border.Background>
-                        <SolidColorBrush Color="#353535"/>
-                    </Border.Background>
-                    <TextBlock FontSize="14" Foreground="White" VerticalAlignment="Center" 
-                               HorizontalAlignment="Center">Home</TextBlock>
-                </Border>
-                <!--<Border Width="30">
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
-                    </Border>-->
-            </StackPanel>
         </Grid>
 
 
