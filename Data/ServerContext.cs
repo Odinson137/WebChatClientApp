@@ -6,6 +6,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Text;
+using static WebChatClientApp.Data.ServerContext;
+using System.Linq;
+using System.Net;
 
 namespace WebChatClientApp.Data
 {
@@ -101,6 +104,23 @@ namespace WebChatClientApp.Data
             }
         }
 
+        public async void PostRequestUrl(string controller, Dictionary<string, object> parameters)
+        {
+            string apiUrl = $"{url}/api/{controller}";
+            try
+            {
+                var query = string.Join("&", parameters
+                    .Select(kvp => $"{kvp.Key}={WebUtility.UrlEncode(kvp.Value.ToString())}"));
+
+                var fullUrl = $"{apiUrl}?{query}";
+                await SendPostRequestUrl(fullUrl);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
         // Метод для отправки данных на сервер
         public async Task SendPostRequest<P>(string apiUrl, P getModel)
         {
@@ -108,14 +128,11 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
-                    // Преобразуем данные в JSON
                     var jsonData = JsonConvert.SerializeObject(getModel);
                     var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-                    // Отправляем запрос методом POST
                     var response = await httpClient.PostAsync(apiUrl, content);
 
-                    // Проверяем успешность запроса
                     if (response.IsSuccessStatusCode)
                     {
                         //MessageBox.Show("Сообщение успешно отправлено на сервер.");
@@ -131,5 +148,33 @@ namespace WebChatClientApp.Data
                 }
             }
         }
+
+        // Метод для отправки данных на сервер с уже готовым url с параметрами
+        public async Task SendPostRequestUrl(string fullUrl)
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                try
+                {
+                    var content = new StringContent("", Encoding.UTF8, "application/json");
+
+                    var response = await httpClient.PostAsync(fullUrl, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        //MessageBox.Show("Сообщение успешно отправлено на сервер.");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Произошла ошибка при отправке запроса на сервер. Код ошибки: " + response.StatusCode);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Произошла ошибка при отправке запроса на сервер: " + ex.Message);
+                }
+            }
+        }
+
     }
 }
