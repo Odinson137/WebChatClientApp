@@ -2,12 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using WebChatClientApp.Commands;
 using WebChatClientApp.Data;
 using WebChatClientApp.Models;
@@ -42,7 +38,7 @@ namespace WebChatClientApp.ViewModels
                 if (chat.Messages == null)
                 {
                     GetMessages();
-                    chat.Message = new MessageModel();
+                    //chat.Message = new MessageModel();
                 }
 
                 OnPropertyChanged("Chat");
@@ -63,9 +59,7 @@ namespace WebChatClientApp.ViewModels
         public ChatMenuViewModel()
         {
             _context = new ServerContext();
-            //Chat = new ChatModel();
             Chats = new ObservableCollection<ChatModel>();
-            //Chat.Messages = new ObservableCollection<MessageModel>();
         }
 
         private void ChatMenuFunc()
@@ -146,14 +140,45 @@ namespace WebChatClientApp.ViewModels
             {
                 return sendMessage ?? (sendMessage = new Command(obj =>
                 {
-                    Chat.Message.ChatID = Chat.ChatID;
-                    Chat.Message.UserID = User.UserID;
-                    Chat.Message.SendTime = DateTime.Now;
+                    TextBox box = (TextBox)obj;
+                    string text = box.Text;
+                    box.Clear();
 
-                    Chat.Messages.Add(Chat.Message);
-                    _context.PostRequest("Message", Chat.Message);
+                    MessageModel newMessage = new MessageModel()
+                    {
+                        Text = text,
+                        SendTime = DateTime.Now,
+                        UserID = User.UserID,
+                        ChatID = Chat.ChatID
+                    };
 
-                    Chat.Message = new MessageModel();
+                    Chat.Messages.Add(newMessage);
+                    _context.PostRequest("Message", newMessage);
+                }));
+            }
+        }
+
+        private Command createNewChat;
+        public Command CreateNewChat
+        {
+            get
+            {
+                return createNewChat ?? (createNewChat = new Command(obj =>
+                {
+                    string title = (string)obj;
+                    ChatModel newChat = new ChatModel()
+                    {
+                        Title = title,
+                        Users = new ObservableCollection<UserModel>() { user}
+                    };
+
+                    Chats.Add(newChat);
+                    
+                    _context.PostRequestUrl("Chat", new Dictionary<string, object>()
+                    {
+                        ["title"] = title,
+                        ["userID"] = user.UserID
+                    });
                 }));
             }
         }

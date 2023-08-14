@@ -10,17 +10,6 @@ namespace WebChatClientApp.Models
         public int ChatID { get; set; }
         public string Title { get; set; }
 
-        private MessageModel message;
-        public MessageModel Message
-        {
-            get => message;
-            set
-            {
-                message = value;
-                OnPropertyChanged("Message");
-            }
-        }
-
         private ObservableCollection<UserModel> users;
         public ObservableCollection<UserModel> Users
         {
