@@ -8,7 +8,16 @@ namespace WebChatClientApp.Models
     public class ChatModel : INotifyPropertyChanged
     {
         public int ChatID { get; set; }
-        public string Title { get; set; }
+        private string title;
+        public string Title
+        {
+            get => title;
+            set
+            {
+                title = value;
+                OnPropertyChanged("Title");
+            }
+        }
 
         private ObservableCollection<UserModel> users;
         public ObservableCollection<UserModel> Users

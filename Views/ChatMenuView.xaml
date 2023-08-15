@@ -97,7 +97,7 @@
 
                 <Border Grid.Column="0" Width="100">
                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
-                               FontSize="18" Text="Add">
+                               FontSize="18" Text="Add" >
                         <TextBlock.Foreground>
                             <SolidColorBrush Color="White"/>
                         </TextBlock.Foreground>
@@ -122,13 +122,17 @@
                     </TextBlock>
                 </Border>
 
-                <TextBox x:Name="ChatTitle" MinHeight="50" Grid.Column="1" MinWidth="20" Text="{Binding Chat.Title}" Foreground="White"
+                <TextBox x:Name="ChatTitle" MinHeight="50" Grid.Column="1" MinWidth="20" 
+                         Text="{Binding Chat.Title}" Foreground="White"
                          SelectionTextBrush="{DynamicResource LightPurpleColorBrush}"
                          FontSize="18" Background="{x:Null}" SelectionOpacity="1" 
                          BorderBrush="{x:Null}" CaretBrush="{DynamicResource LightBlueColorBrush}"
                          VerticalAlignment="Center" AcceptsTab="True" AutoWordSelection="True"
                          FocusVisualStyle="{x:Null}" BorderThickness="0" Padding="5" AcceptsReturn="True" 
                          VerticalContentAlignment="Center">
+                    <TextBox.SelectionBrush>
+                        <SolidColorBrush Color="#FFCFAAF3" Opacity="0.4"/>
+                    </TextBox.SelectionBrush>
                 </TextBox>
 
                 <Border Grid.Column="2" Width="100">
@@ -147,6 +151,14 @@
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction 
+                                    Command="{Binding RenameChat}"
+                                    CommandParameter="{Binding ElementName=ChatTitle, Path=Text}"
+                                    />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                     </TextBlock>
                 </Border>
             </Grid>

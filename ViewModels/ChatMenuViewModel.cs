@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using WebChatClientApp.Commands;
@@ -38,7 +39,6 @@ namespace WebChatClientApp.ViewModels
                 if (chat.Messages == null)
                 {
                     GetMessages();
-                    //chat.Message = new MessageModel();
                 }
 
                 OnPropertyChanged("Chat");
@@ -166,6 +166,13 @@ namespace WebChatClientApp.ViewModels
                 return createNewChat ?? (createNewChat = new Command(obj =>
                 {
                     string title = (string)obj;
+
+                    if (Chats.Select(c => c.Title == title).Count() > 0)
+                    {
+                        MessageBox.Show("Чат с таким названием уже существует");
+                        return;
+                    } 
+
                     ChatModel newChat = new ChatModel()
                     {
                         Title = title,
@@ -178,6 +185,26 @@ namespace WebChatClientApp.ViewModels
                     {
                         ["title"] = title,
                         ["userID"] = user.UserID
+                    });
+                }));
+            }
+        }
+
+        private Command renameChat;
+        public Command RenameChat
+        {
+            get
+            {
+                return renameChat ?? (renameChat = new Command(obj =>
+                {
+                    string newTitle = (string)obj;
+
+                    Chat.Title = newTitle;
+
+                    _context.PutRequestUrl("Chat", new Dictionary<string, object>()
+                    {
+                        ["title"] = newTitle,
+                        ["chatId"] = chat.ChatID
                     });
                 }));
             }
