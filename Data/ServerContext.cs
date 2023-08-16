@@ -8,6 +8,7 @@ using System.Windows;
 using System.Text;
 using System.Linq;
 using System.Net;
+using static WebChatClientApp.Data.ServerContext;
 
 namespace WebChatClientApp.Data
 {
@@ -53,7 +54,11 @@ namespace WebChatClientApp.Data
         // Делегат, который передает значения модели со стороны сервера из данного класса в тот класс, который его реализует
         // Позволяет реализующим классам абсрагироваться от http запросов
         public delegate void GetModel<T>(T model);
- 
+
+        // Делегат, который принимает ответы со стороны сервера об успешности или провале добавления/обновления/удаления данных
+        // является дополнительным параметром, так как не всегда важно что либо принимать со стороны сервера после отправки данных
+        public delegate void GetValueFromServer(string model);
+
         // Метод для получения результов от сервера по запросу
         // Имеет две реализации для моделей и для коллекций
         //
@@ -103,7 +108,7 @@ namespace WebChatClientApp.Data
             }
         }
 
-        public async void PostRequestUrl(string controller, Dictionary<string, object> parameters)
+        public async void PostRequestUrl(string controller, Dictionary<string, object> parameters, GetValueFromServer getValue = null)
         {
             string apiUrl = $"{url}/api/{controller}";
             try
@@ -112,7 +117,7 @@ namespace WebChatClientApp.Data
                     .Select(kvp => $"{kvp.Key}={WebUtility.UrlEncode(kvp.Value.ToString())}"));
 
                 var fullUrl = $"{apiUrl}?{query}";
-                await SendPostRequestUrl(fullUrl);
+                await SendPostRequestUrl(fullUrl, getValue);
             }
             catch (Exception ex)
             {
@@ -148,7 +153,7 @@ namespace WebChatClientApp.Data
         }
 
         // Метод для отправки данных на сервер с уже готовым url с параметрами
-        public async Task SendPostRequestUrl(string fullUrl)
+        public async Task SendPostRequestUrl(string fullUrl, GetValueFromServer getValue)
         {
             using (HttpClient httpClient = new HttpClient())
             {
@@ -160,7 +165,11 @@ namespace WebChatClientApp.Data
 
                     if (response.IsSuccessStatusCode)
                     {
-                        //MessageBox.Show("Сообщение успешно отправлено на сервер.");
+                        if (getValue != null)
+                        {
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            getValue(responseContent);
+                        }
                     }
                     else
                     {
@@ -221,7 +230,7 @@ namespace WebChatClientApp.Data
         // Метод для создания запросов к серверу
         // Для удаления данных из базы
         // adress: ../Controller/id
-        public async void PutRequestUrl(string controller, object id)
+        public async void DeleteRequestUrl(string controller, object id)
         {
             string apiUrl = $"{url}/api/{controller}/{id}";
             try

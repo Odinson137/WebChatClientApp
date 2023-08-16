@@ -57,4 +57,22 @@ namespace WebChatClientApp.Converters
             throw new NotImplementedException();
         }
     }
+
+    public class ChangeTypeMenu : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value.ToString() == parameter.ToString())
+            {
+                return "Visibility";
+            }
+            return "Collapsed";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 }

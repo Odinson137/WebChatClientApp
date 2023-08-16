@@ -36,7 +36,7 @@ namespace WebChatClientApp.ViewModels
             {
                 chat = value;
 
-                if (chat.Messages == null)
+                if (chat != null && chat.Messages == null)
                 {
                     GetMessages();
                 }
@@ -44,6 +44,8 @@ namespace WebChatClientApp.ViewModels
                 OnPropertyChanged("Chat");
             }
         }
+
+
 
         private ObservableCollection<ChatModel> chats;
         public ObservableCollection<ChatModel> Chats
@@ -55,7 +57,21 @@ namespace WebChatClientApp.ViewModels
                 OnPropertyChanged("Chats");
             }
         }
-        
+
+        private ObservableCollection<string> friends;
+        public ObservableCollection<string> Friends
+        {
+            get
+            {
+                return friends;
+            }
+            set
+            {
+                friends = value;
+                OnPropertyChanged("Friends");
+            }
+        }
+
         public ChatMenuViewModel()
         {
             _context = new ServerContext();
@@ -167,7 +183,7 @@ namespace WebChatClientApp.ViewModels
                 {
                     string title = (string)obj;
 
-                    if (Chats.Select(c => c.Title == title).Count() > 0)
+                    if (Chats.All(c => c.Title != title) == false)
                     {
                         MessageBox.Show("Чат с таким названием уже существует");
                         return;
@@ -180,14 +196,21 @@ namespace WebChatClientApp.ViewModels
                     };
 
                     Chats.Add(newChat);
-                    
+
                     _context.PostRequestUrl("Chat", new Dictionary<string, object>()
                     {
                         ["title"] = title,
                         ["userID"] = user.UserID
-                    });
+                    }, GetId);
                 }));
             }
+        }
+
+        public void GetId(string chatId)
+        {
+            int id = int.Parse(chatId);
+            Chat = Chats.Last();
+            Chat.ChatID = id;
         }
 
         private Command renameChat;
@@ -206,6 +229,38 @@ namespace WebChatClientApp.ViewModels
                         ["title"] = newTitle,
                         ["chatId"] = chat.ChatID
                     });
+                }));
+            }
+        }
+
+        private Command deleteChat;
+        public Command DeleteChat
+        {
+            get
+            {
+                return deleteChat ?? (deleteChat = new Command(obj =>
+                {
+                    _context.DeleteRequestUrl("Chat", Chat.ChatID);
+                    Chats.Remove(chat);
+                }));
+            }
+        }
+
+        public int SelectedMenu { get; set; } = 0;
+        private Command changeMenu;
+        public Command ChangeMenu
+        {
+            get
+            {
+                return changeMenu ?? (changeMenu = new Command(obj =>
+                {
+                    if ((string)obj == "1") {
+                        SelectedMenu = 1;
+                    } else
+                    {
+                        SelectedMenu = 0;
+                    }
+                    OnPropertyChanged("SelectedMenu");
                 }));
             }
         }
