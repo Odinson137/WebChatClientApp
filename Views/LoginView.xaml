@@ -3,15 +3,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WebChatClientApp.Views" xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             mc:Ignorable="d" 
-             >
-
+        xmlns:local="clr-namespace:WebChatClientApp.Views" 
+        xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        mc:Ignorable="d" xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:recontrolls="clr-namespace:WebChatClientApp.Views.ReControls" >
 
     <UserControl.DataContext>
         <controllers:LoginViewModel/>
     </UserControl.DataContext>
 
+    <UserControl.Resources>
+        <Color x:Key="LightBlueColor">#268e9c</Color>
+        <Color x:Key="LightPurpleColor">#cfaaf3</Color>
+        <Color x:Key="TextColorBlue">#0e9eb7</Color>
+        <Color x:Key="BlackColor">#222222</Color>
+
+        <SolidColorBrush x:Key="LightBlueColorBrush">#268e9c</SolidColorBrush>
+        <SolidColorBrush x:Key="LightPurpleColorBrush">#cfaaf3</SolidColorBrush>
+        <SolidColorBrush x:Key="TextColorBrushBlue">#0e9eb7</SolidColorBrush>
+        <SolidColorBrush x:Key="BlackColorBrush">#222222</SolidColorBrush>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
@@ -59,30 +72,59 @@
                 <ColumnDefinition Width="30*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Margin="100 0 0 0" Width="300" Height="400" 
-                            HorizontalAlignment="Center" VerticalAlignment="Center">
-
-                
-
-                <TextBlock Text="{Binding Page1Parameter, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+            <StackPanel Grid.Column="0" Margin="0" Width="300" Height="400">
 
                 <TextBlock FontSize="24" Foreground="White"
                                Text="Add account:" TextAlignment="Center"/>
-                <TextBox Margin="0 10 0 0" FontSize="24" Text="Name" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
-                             BorderThickness="0 0 0 2" BorderBrush="White"
-                             Background="{x:Null}" Foreground="White">
+
+                <TextBlock Text="{Binding FailedPassword}" Foreground="White"
+                           FontSize="20" Opacity="0.7" TextAlignment="Center" TextWrapping="Wrap"/>
+
+                <TextBox materialDesign:HintAssist.Hint="UserName"   
+                         materialDesign:HintAssist.Foreground="White"  
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Margin="0 5 0 0" FontSize="24" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
+                         BorderThickness="0 0 0 2" BorderBrush="White" Text="{Binding CreateUser.UserName, 
+                                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Background="{x:Null}" Foreground="White" CaretBrush="{DynamicResource LightPurpleColorBrush}"
+                         >
                     <TextBox.SelectionTextBrush>
                         <SolidColorBrush Color="#FF0E9EB7" Opacity="0"/>
                     </TextBox.SelectionTextBrush>
                 </TextBox>
 
-                <TextBox Margin="0 5 0 0" FontSize="24" Text="Password" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
+                <PasswordBox recontrolls:PasswordBoxAssistant.BindPassword="True"
+                             recontrolls:PasswordBoxAssistant.BoundPassword="{Binding CreateUser.Password, 
+                                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             x:Name="Password" materialDesign:HintAssist.Hint="Password"
+                             materialDesign:HintAssist.Foreground="White"  
+                             Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+                             Margin="0 5 0 0" FontSize="24" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
                              BorderThickness="0 0 0 2" BorderBrush="White"
                              Background="{x:Null}" Foreground="White">
-                    <TextBox.SelectionTextBrush>
-                        <SolidColorBrush Color="#FF0E9EB7" Opacity="0"/>
-                    </TextBox.SelectionTextBrush>
-                </TextBox>
+                </PasswordBox>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Button Margin="10" Content="Registration" 
+                            Background="{DynamicResource LightBlueColorBrush}" 
+                            BorderBrush="{DynamicResource LightBlueColorBrush}" 
+                            OpacityMask="{DynamicResource LightPurpleColorBrush}"
+                            Command="{Binding GetAuthority}" 
+                            CommandParameter="{Binding ElementName=Password, Path=Password}"/>
+
+                    <Button Grid.Column="1" Margin="10" Content="Authentication" 
+                            Background="{DynamicResource LightBlueColorBrush}" 
+                            BorderBrush="{DynamicResource LightBlueColorBrush}" 
+                            OpacityMask="{DynamicResource LightPurpleColorBrush}"
+                            >
+                    </Button>
+
+                </Grid>
             </StackPanel>
             <StackPanel Grid.Column="1">
                 <StackPanel.Background>
@@ -98,8 +140,7 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Margin="0 0 20 0" FontSize="18" Foreground="{StaticResource LightBlueColorBrush}"  Text="{Binding Name}"/>
-                                <TextBlock FontSize="18" Foreground="White" Text="{Binding LastName}"/>
+                                <TextBlock FontSize="24" Foreground="{StaticResource LightBlueColorBrush}"  Text="{Binding UserName}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

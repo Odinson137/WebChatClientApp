@@ -6,36 +6,13 @@
              xmlns:viewsmodel="clr-namespace:WebChatClientApp.ViewModels"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
-        <!--<DataTemplate DataType="{x:Type viewsmodel:ChatMenuViewModel}">
-            <views:ChatMenuView/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewsmodel:UserViewModel}">
-            <views:LoginView/>
-        </DataTemplate>-->
-
-        <!--<Color x:Key="LigthRedColor">#e43448</Color>
-        <Color x:Key="PinkColor">#fc94ac</Color>
-        <Color x:Key="DarkRedColor">#7c0b14</Color>
-        <Color x:Key="PurpleColor">#946c84</Color>
-        <Color x:Key="GrayColor">#c49cac</Color>
-        <Color x:Key="DarkBlueColor">#304e55</Color>
-
-        <SolidColorBrush x:Key="LigthRed">#e43448</SolidColorBrush>
-        <SolidColorBrush x:Key="Pink">#fc94ac</SolidColorBrush>
-        <SolidColorBrush x:Key="DarkRed">#7c0b14</SolidColorBrush>
-        <SolidColorBrush x:Key="Purple">#946c84</SolidColorBrush>
-        <SolidColorBrush x:Key="Gray">#c49cac</SolidColorBrush>
-        <SolidColorBrush x:Key="DarkBlue">#304e55</SolidColorBrush>-->
-
-        <Color x:Key="LightBlueColor">#268e9c</Color>
-        <Color x:Key="LightPurpleColor">#cfaaf3</Color>
-        <Color x:Key="TextColorBlue">#0e9eb7</Color>
-        <Color x:Key="BlackColor">#222222</Color>
-
-        <SolidColorBrush x:Key="LightBlueColorBrush">#268e9c</SolidColorBrush>
-        <SolidColorBrush x:Key="LightPurpleColorBrush">#cfaaf3</SolidColorBrush>
-        <SolidColorBrush x:Key="TextColorBrushBlue">#0e9eb7</SolidColorBrush>
-        <SolidColorBrush x:Key="BlackColorBrush">#222222</SolidColorBrush>
-    
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

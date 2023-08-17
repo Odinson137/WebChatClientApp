@@ -18,7 +18,19 @@
         <controllers:MainViewModel/>
     </Window.DataContext>
 
+    
+
     <Window.Resources>
+        <Color x:Key="LightBlueColor">#268e9c</Color>
+        <Color x:Key="LightPurpleColor">#cfaaf3</Color>
+        <Color x:Key="TextColorBlue">#0e9eb7</Color>
+        <Color x:Key="BlackColor">#222222</Color>
+
+        <SolidColorBrush x:Key="LightBlueColorBrush">#268e9c</SolidColorBrush>
+        <SolidColorBrush x:Key="LightPurpleColorBrush">#cfaaf3</SolidColorBrush>
+        <SolidColorBrush x:Key="TextColorBrushBlue">#0e9eb7</SolidColorBrush>
+        <SolidColorBrush x:Key="BlackColorBrush">#222222</SolidColorBrush>
+
         <DataTemplate DataType="{x:Type viewsmodel:ChatMenuViewModel}">
             <views:ChatMenuView/>
         </DataTemplate>

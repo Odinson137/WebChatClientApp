@@ -38,7 +38,7 @@ namespace WebChatClientApp.Data
             }
 }
 
-        public async void GetRequest<G>(string controller, object id, GetModel<G> getModel)
+        public async Task GetRequest<G>(string controller, object id, GetModel<G> getModel)
         {
             string apiUrl = $"{url}/api/{controller}/{id}";
             try
@@ -95,12 +95,12 @@ namespace WebChatClientApp.Data
         // Метод для создания запросов к серверу
         // Для отправки данных
         // adress: ../Controller/
-        public async void PostRequest<P>(string controller, P getModel)
+        public async void PostRequest<P>(string controller, P getModel, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
         {
             string apiUrl = $"{url}/api/{controller}";
             try
             {
-                await SendPostRequest(apiUrl, getModel);
+                await SendPostRequest(apiUrl, getModel, getValue, failedError);
             }
             catch (Exception ex)
             {
@@ -108,7 +108,7 @@ namespace WebChatClientApp.Data
             }
         }
 
-        public async void PostRequestUrl(string controller, Dictionary<string, object> parameters, GetValueFromServer getValue = null)
+        public async void PostRequestUrl(string controller, Dictionary<string, object> parameters, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
         {
             string apiUrl = $"{url}/api/{controller}";
             try
@@ -117,7 +117,7 @@ namespace WebChatClientApp.Data
                     .Select(kvp => $"{kvp.Key}={WebUtility.UrlEncode(kvp.Value.ToString())}"));
 
                 var fullUrl = $"{apiUrl}?{query}";
-                await SendPostRequestUrl(fullUrl, getValue);
+                await SendPostRequestUrl(fullUrl, getValue, failedError);
             }
             catch (Exception ex)
             {
@@ -126,7 +126,7 @@ namespace WebChatClientApp.Data
         }
 
         // Метод для отправки данных на сервер
-        public async Task SendPostRequest<P>(string apiUrl, P getModel)
+        public async Task SendPostRequest<P>(string apiUrl, P getModel, GetValueFromServer getValue, GetValueFromServer failedError)
         {
             using (HttpClient httpClient = new HttpClient())
             {
@@ -138,11 +138,22 @@ namespace WebChatClientApp.Data
                     var response = await httpClient.PostAsync(apiUrl, content);
                     if (response.IsSuccessStatusCode)
                     {
-                        //MessageBox.Show("Сообщение успешно отправлено на сервер.");
+                        if (getValue != null)
+                        {
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            getValue(responseContent);
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("Произошла ошибка при отправке сообщения на сервер. Код ошибки: " + response.StatusCode);
+                        if (failedError != null)
+                        {
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            failedError(responseContent);
+                        } else 
+                        {
+                            MessageBox.Show("Произошла ошибка при отправке запроса на сервер. Код ошибки: " + response.StatusCode);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -153,7 +164,7 @@ namespace WebChatClientApp.Data
         }
 
         // Метод для отправки данных на сервер с уже готовым url с параметрами
-        public async Task SendPostRequestUrl(string fullUrl, GetValueFromServer getValue)
+        public async Task SendPostRequestUrl(string fullUrl, GetValueFromServer getValue, GetValueFromServer failedError)
         {
             using (HttpClient httpClient = new HttpClient())
             {
@@ -173,7 +184,14 @@ namespace WebChatClientApp.Data
                     }
                     else
                     {
-                        MessageBox.Show("Произошла ошибка при отправке запроса на сервер. Код ошибки: " + response.StatusCode);
+                        if (failedError != null)
+                        {
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            getValue(responseContent);
+                        } else
+                        {
+                            MessageBox.Show("Произошла ошибка при отправке запроса на сервер. Код ошибки: " + response.StatusCode);
+                        }
                     }
                 }
                 catch (Exception ex)

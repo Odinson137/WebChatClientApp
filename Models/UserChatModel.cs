@@ -10,9 +10,9 @@ namespace WebChatClientApp.Models
 {
     public class UserChatModel : INotifyPropertyChanged
     {
-        public int UserChatID { get; set; }
-        public int UserID { get; set; }
-        public int ChatID { get; set; }
+        public int UserChatId { get; set; }
+        public string UserId { get; set; }
+        public int ChatId { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void OnPropertyChanged([CallerMemberName]string prop = "")

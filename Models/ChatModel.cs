@@ -7,7 +7,7 @@ namespace WebChatClientApp.Models
 {
     public class ChatModel : INotifyPropertyChanged
     {
-        public int ChatID { get; set; }
+        public int ChatId { get; set; }
         private string title;
         public string Title
         {

@@ -11,38 +11,16 @@ namespace WebChatClientApp.Models
 {
     public class UserModel : INotifyPropertyChanged
     {
-        public int UserID { get; set; }
+        public string Id { get; set; }
 
-        private string name = "";
-        public string Name
+        private string userName = "";
+        public string UserName
         {
-            get => name;
+            get => userName;
             set
             {
-                name = value;
-                OnPropertyChanged("Name");
-            }
-        }
-
-        private string lastName = "";
-        public string LastName
-        {
-            get => lastName;
-            set
-            {
-                lastName = value;
-                OnPropertyChanged("LastName");
-            }
-        }
-
-        private string password = "";
-        public string Password
-        {
-            get => password;
-            set
-            {
-                password = value;
-                OnPropertyChanged("Password");
+                userName = value;
+                OnPropertyChanged("UserName");
             }
         }
 

@@ -10,9 +10,9 @@ namespace WebChatClientApp.Models
 {
     public class MessageModel : INotifyPropertyChanged
     {
-        public int MessageID { get; set; }
-        public int UserID { get; set; }
-        public int ChatID { get; set; }
+        public int MessageId { get; set; }
+        public string Id { get; set; }
+        public int ChatId { get; set; }
 
         private string text;
         public string Text

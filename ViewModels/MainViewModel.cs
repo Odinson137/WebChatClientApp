@@ -58,9 +58,8 @@ namespace WebChatClientApp.ViewModels
             _context.GetRequest<ObservableCollection<UserModel>>("User", CreateUserModel);
 
 
-            //LoginView page = new LoginView();
-            
-            ChatMenuView page = new ChatMenuView();
+            LoginView page = new LoginView();
+            //ChatMenuView page = new ChatMenuView();
             CurrentPage = page;
         }
 

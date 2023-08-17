@@ -2,17 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 using WebChatClientApp.Commands;
 using WebChatClientApp.Data;
 using WebChatClientApp.Models;
+using WebChatClientApp.Models.DTO;
 
 namespace WebChatClientApp.ViewModels
 {
@@ -31,16 +26,7 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        private string page1Parameter;
-        public string Page1Parameter
-        {
-            get { return page1Parameter; }
-            set
-            {
-                page1Parameter = value;
-                OnPropertyChanged(nameof(Page1Parameter));
-            }
-        }
+        public User CreateUser { get; set; }
 
         private ObservableCollection<UserModel> users;
         public ObservableCollection<UserModel> Users
@@ -58,6 +44,7 @@ namespace WebChatClientApp.ViewModels
             _context = new ServerContext();
 
             _context.GetRequest<ObservableCollection<UserModel>>("User", CreateUserModel);
+            CreateUser = new User();
         }
 
         public delegate void UserViewModelDelegate();
@@ -67,65 +54,49 @@ namespace WebChatClientApp.ViewModels
             Users = users;
         }
 
-        //public void AddUserModel(UserModel model)
-        //{
-        //    User = model;
-        //}
+        private string failedPassword = "";
+        public string FailedPassword
+        {
+            get => failedPassword;
+            set
+            {
+                failedPassword = value;
+                OnPropertyChanged("FailedPassword");
+            }
+        }
 
-        //private Command getUser;
-        //public Command GetUser
-        //{
-        //    get 
-        //    {
-        //        return getUser ?? (getUser = new Command(obj =>
-        //        {
-        //            try
-        //            {
-        //                // подключемся к хабу
-        //                connection.StartAsync();
-        //                MessageBox.Show("Вы вошли в чат");
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                MessageBox.Show(ex.Message);
-        //            }
-        //        }));
-        //    }
-        //}
+        private Command getAuthority;
+        public Command GetAuthority
+        {
+            get
+            {
+                return getAuthority ?? (getAuthority = new Command(obj =>
+                {
+                    if (CreateUser.UserName == null || CreateUser.Password == null)
+                    {
+                        FailedPassword = "Not all data is filled in";
+                    } else
+                    {
+                        _context.PostRequest("User", CreateUser, GetUserId, GetFailed);
+                    }
+                }));
+            }
+        }
 
-        //public void GetUsers(ICollection<UserModel> models)
-        //{
-        //    Users = new ObservableCollection<UserModel>(models);
-        //}
+        public void GetUserId(string userId)
+        {
+            UserModel user = new UserModel()
+            {
+                Id = userId,
+                UserName = CreateUser.UserName
+            };
+            Users.Add(user);
+            FailedPassword = "Successfully created";
+        }
 
-        //private Command getUsers;
-        //public Command GetAllUsers
-        //{
-        //    get
-        //    {
-        //        return getUsers ?? (getUsers = new Command(obj =>
-        //        {
-        //            SendMessageAsync("asdasd");
-        //        }));
-        //    }
-        //}
-
-        //private async Task SendMessageAsync(string message)
-        //{
-        //    try
-        //    {
-        //        await connection.SendAsync("Send", "asd");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"Ошибка отправки сообщения: {ex.Message}");
-        //    }
-        //}
-
-        //public event PropertyChangedEventHandler PropertyChanged;
-        //public void OnPropertyChanged([CallerMemberName] string prop = "")
-        //{
-        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        //}
+        public void GetFailed(string failed)
+        {
+            FailedPassword = failed;
+        }
     }
 }

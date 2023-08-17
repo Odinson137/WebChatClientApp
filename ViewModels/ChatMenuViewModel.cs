@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using WebChatClientApp.Commands;
@@ -78,9 +79,9 @@ namespace WebChatClientApp.ViewModels
             Chats = new ObservableCollection<ChatModel>();
         }
 
-        private void ChatMenuFunc()
+        private async void ChatMenuFunc()
         {
-            _context.GetRequest<ObservableCollection<ChatModel>>("Chat", User.UserID, CreateChat);
+            await _context.GetRequest<ObservableCollection<ChatModel>>("Chat", User.Id, CreateChat);
 
             connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:7078/chat")
@@ -88,7 +89,7 @@ namespace WebChatClientApp.ViewModels
 
             connection.On<int, int, string>("OnReceiveMessage", OnReceiveMessage);
 
-            Connecting();
+            await Connecting();
         }
 
         public void CreateChat(ObservableCollection<ChatModel> models)
@@ -100,22 +101,22 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        private async void Connecting()
+        private async Task Connecting()
         {
             try
             {
                 await connection.StartAsync();
-                await connection.InvokeAsync("SendMessage", User.UserID);
+                await connection.InvokeAsync("SendMessage", User.Id);
             }
-            catch (Exception ex)
+            catch (Exception ex)    
             {
                 MessageBox.Show("Connecting error" + ex.Message);
             }
         }
 
-        private void OnReceiveMessage(int userSendId, int chatSendId, string sendMessage)
+        private async Task OnReceiveMessage(int userSendId, int chatSendId, string sendMessage)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            await Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 Chat.Messages.Add(new MessageModel()
                 {
@@ -124,9 +125,9 @@ namespace WebChatClientApp.ViewModels
             });
         }
 
-        private void GetMessages()
+        private async Task GetMessages()
         {
-            _context.GetRequest<ObservableCollection<MessageModel>>("Message", Chat.ChatID, CreateMessage);
+            await _context.GetRequest<ObservableCollection<MessageModel>>("Message", Chat.ChatId, CreateMessage);
         }
 
         public void CreateMessage(ObservableCollection<MessageModel> messages)
@@ -141,8 +142,8 @@ namespace WebChatClientApp.ViewModels
             {
                 return loadingCommand ?? (loadingCommand = new Command(obj =>
                 {
-                    //User = (UserModel)obj;
-                    User = new UserModel() { UserID = 1, Name = "Yura", LastName = "Bury", Password = "123" };
+                    User = (UserModel)obj;
+                    //User = new UserModel() { UserID = "1", UserName = "Yura" };
                      
                     ChatMenuFunc();
                 }));
@@ -164,8 +165,8 @@ namespace WebChatClientApp.ViewModels
                     {
                         Text = text,
                         SendTime = DateTime.Now,
-                        UserID = User.UserID,
-                        ChatID = Chat.ChatID
+                        Id = User.Id,
+                        ChatId = Chat.ChatId
                     };
 
                     Chat.Messages.Add(newMessage);
@@ -200,7 +201,7 @@ namespace WebChatClientApp.ViewModels
                     _context.PostRequestUrl("Chat", new Dictionary<string, object>()
                     {
                         ["title"] = title,
-                        ["userID"] = user.UserID
+                        ["userId"] = user.Id
                     }, GetId);
                 }));
             }
@@ -210,7 +211,7 @@ namespace WebChatClientApp.ViewModels
         {
             int id = int.Parse(chatId);
             Chat = Chats.Last();
-            Chat.ChatID = id;
+            Chat.ChatId = id;
         }
 
         private Command renameChat;
@@ -227,7 +228,7 @@ namespace WebChatClientApp.ViewModels
                     _context.PutRequestUrl("Chat", new Dictionary<string, object>()
                     {
                         ["title"] = newTitle,
-                        ["chatId"] = chat.ChatID
+                        ["chatId"] = chat.ChatId
                     });
                 }));
             }
@@ -240,7 +241,7 @@ namespace WebChatClientApp.ViewModels
             {
                 return deleteChat ?? (deleteChat = new Command(obj =>
                 {
-                    _context.DeleteRequestUrl("Chat", Chat.ChatID);
+                    _context.DeleteRequestUrl("Chat", Chat.ChatId);
                     Chats.Remove(chat);
                 }));
             }
