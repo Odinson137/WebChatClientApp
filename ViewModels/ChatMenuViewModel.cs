@@ -18,6 +18,40 @@ namespace WebChatClientApp.ViewModels
 
         private readonly ServerContext _context;
 
+        private ObservableCollection<TabViewModel> tabs = new ObservableCollection<TabViewModel>();
+        public ObservableCollection<TabViewModel> Tabs
+        {
+            get { return tabs; }
+            set
+            {
+                tabs = value;
+                OnPropertyChanged(nameof(Tabs));
+            }
+        }
+
+        private ObservableCollection<string> titleTabs = new ObservableCollection<string>();
+
+        public ObservableCollection<string> TitleTabs
+        {
+            get { return titleTabs; }
+            set
+            {
+                titleTabs = value;
+                OnPropertyChanged(nameof(TitleTabs));
+            }
+        }
+
+        private TabViewModel selectedTab;
+        public TabViewModel SelectedTab
+        {
+            get { return selectedTab; }
+            set
+            {
+                selectedTab = value;
+                OnPropertyChanged(nameof(SelectedTab));
+            }
+        }
+
         private UserModel user;
         public UserModel User
         {
@@ -28,25 +62,6 @@ namespace WebChatClientApp.ViewModels
                 OnPropertyChanged(nameof(user));
             }
         }
-
-        private ChatModel chat;
-        public ChatModel Chat
-        {
-            get => chat;
-            set
-            {
-                chat = value;
-
-                if (chat != null && chat.Messages == null)
-                {
-                    GetMessages();
-                }
-
-                OnPropertyChanged("Chat");
-            }
-        }
-
-
 
         private ObservableCollection<ChatModel> chats;
         public ObservableCollection<ChatModel> Chats
@@ -81,6 +96,7 @@ namespace WebChatClientApp.ViewModels
 
         private async void ChatMenuFunc()
         {
+            
             await _context.GetRequest<ObservableCollection<ChatModel>>("Chat", User.Id, CreateChat);
 
             connection = new HubConnectionBuilder()
@@ -90,15 +106,13 @@ namespace WebChatClientApp.ViewModels
             connection.On<int, int, string>("OnReceiveMessage", OnReceiveMessage);
 
             await Connecting();
+
+            AddTabFunc("New Tab");
         }
 
         public void CreateChat(ObservableCollection<ChatModel> models)
         {
             Chats = models;
-            if (Chats.Count > 0)
-            {
-                Chat = Chats[0];
-            }
         }
 
         private async Task Connecting()
@@ -118,21 +132,59 @@ namespace WebChatClientApp.ViewModels
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                Chat.Messages.Add(new MessageModel()
+                var chat = Chats.Where(chat => chat.ChatId == chatSendId).First();
+                chat.Messages.Add(new MessageModel()
                 {
                     Text = sendMessage
                 });
             });
         }
 
-        private async Task GetMessages()
+        //private async Task GetMessages()
+        //{
+        //    await _context.GetRequest<ObservableCollection<MessageModel>>("Message", Chat.ChatId, CreateMessage);
+        //}
+
+        //public void CreateMessage(ObservableCollection<MessageModel> messages)
+        //{
+        //    Chat.Messages = messages;
+        //}
+
+        private Command changeTab;
+        public Command ChangeTab
         {
-            await _context.GetRequest<ObservableCollection<MessageModel>>("Message", Chat.ChatId, CreateMessage);
+            get
+            {
+                return changeTab ?? (changeTab = new Command(obj =>
+                {
+                    int index = (int)obj;
+                    
+                    SelectedTab = Tabs[index];
+                }));
+            }
         }
 
-        public void CreateMessage(ObservableCollection<MessageModel> messages)
+        private int index = 0;
+        private Command addTab;
+        public Command AddTab
         {
-            Chat.Messages = messages;
+            get
+            {
+                return addTab ?? (addTab = new Command(obj =>
+                {
+                    if (Tabs.Count() < 6)
+                    {
+                        AddTabFunc("New Tab");
+                    }
+                }));
+            }
+        }
+
+        private void AddTabFunc(string title)
+        {
+            var newTab = new TabViewModel(_context, Chats, User, index++);
+            Tabs.Add(newTab);
+            SelectedTab = newTab;
         }
 
         private Command loadingCommand;
@@ -143,127 +195,16 @@ namespace WebChatClientApp.ViewModels
                 return loadingCommand ?? (loadingCommand = new Command(obj =>
                 {
                     User = (UserModel)obj;
-                    //User = new UserModel() { UserID = "1", UserName = "Yura" };
-                     
+                    //User = new UserModel()
+                    //{
+                    //    Id = "9df1d71c-bdca-4532-978f-1f7423f0cddd",
+                    //    UserName = "Kolobock"
+                    //};
                     ChatMenuFunc();
                 }));
             }
         }
 
-        private Command sendMessage;
-        public Command SendMessage
-        {
-            get
-            {
-                return sendMessage ?? (sendMessage = new Command(obj =>
-                {
-                    TextBox box = (TextBox)obj;
-                    string text = box.Text;
-                    box.Clear();
 
-                    MessageModel newMessage = new MessageModel()
-                    {
-                        Text = text,
-                        SendTime = DateTime.Now,
-                        Id = User.Id,
-                        ChatId = Chat.ChatId
-                    };
-
-                    Chat.Messages.Add(newMessage);
-                    _context.PostRequest("Message", newMessage);
-                }));
-            }
-        }
-
-        private Command createNewChat;
-        public Command CreateNewChat
-        {
-            get
-            {
-                return createNewChat ?? (createNewChat = new Command(obj =>
-                {
-                    string title = (string)obj;
-
-                    if (Chats.All(c => c.Title != title) == false)
-                    {
-                        MessageBox.Show("Чат с таким названием уже существует");
-                        return;
-                    } 
-
-                    ChatModel newChat = new ChatModel()
-                    {
-                        Title = title,
-                        Users = new ObservableCollection<UserModel>() { user}
-                    };
-
-                    Chats.Add(newChat);
-
-                    _context.PostRequestUrl("Chat", new Dictionary<string, object>()
-                    {
-                        ["title"] = title,
-                        ["userId"] = user.Id
-                    }, GetId);
-                }));
-            }
-        }
-
-        public void GetId(string chatId)
-        {
-            int id = int.Parse(chatId);
-            Chat = Chats.Last();
-            Chat.ChatId = id;
-        }
-
-        private Command renameChat;
-        public Command RenameChat
-        {
-            get
-            {
-                return renameChat ?? (renameChat = new Command(obj =>
-                {
-                    string newTitle = (string)obj;
-
-                    Chat.Title = newTitle;
-
-                    _context.PutRequestUrl("Chat", new Dictionary<string, object>()
-                    {
-                        ["title"] = newTitle,
-                        ["chatId"] = chat.ChatId
-                    });
-                }));
-            }
-        }
-
-        private Command deleteChat;
-        public Command DeleteChat
-        {
-            get
-            {
-                return deleteChat ?? (deleteChat = new Command(obj =>
-                {
-                    _context.DeleteRequestUrl("Chat", Chat.ChatId);
-                    Chats.Remove(chat);
-                }));
-            }
-        }
-
-        public int SelectedMenu { get; set; } = 0;
-        private Command changeMenu;
-        public Command ChangeMenu
-        {
-            get
-            {
-                return changeMenu ?? (changeMenu = new Command(obj =>
-                {
-                    if ((string)obj == "1") {
-                        SelectedMenu = 1;
-                    } else
-                    {
-                        SelectedMenu = 0;
-                    }
-                    OnPropertyChanged("SelectedMenu");
-                }));
-            }
-        }
     }
 }

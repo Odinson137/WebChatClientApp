@@ -7,8 +7,10 @@
       xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels" 
       xmlns:recontrolls="clr-namespace:WebChatClientApp.Views.ReControls" 
       xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:converters="clr-namespace:WebChatClientApp.Converters" mc:Ignorable="d"
-      Width="800" Height="600"        >
+              
+      Width="800" Height="600">
 
     <UserControl.DataContext>
         <controllers:ChatMenuViewModel/>
@@ -29,12 +31,13 @@
         <converters:TimeConverter x:Key="TimeConverter"/>
         <converters:ChangeTypeMenu x:Key="ChangeTypeMenu"/>
 
-        <Style TargetType="ListBoxItem">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="IsTabStop" Value="False"/>
+        <Style TargetType="ListBox" x:Key="List"/>
+
+        <Style TargetType="ListBox">
+            <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <ControlTemplate TargetType="{x:Type ListBox}">
                         <ContentPresenter/>
                     </ControlTemplate>
                 </Setter.Value>
@@ -74,6 +77,9 @@
             <WrapPanel />
         </ItemsPanelTemplate>
 
+        <DataTemplate DataType="{x:Type controllers:TabViewModel}">
+            <TextBlock Text="{Binding TabTitle}"/>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
@@ -81,20 +87,17 @@
             <RowDefinition Height="35"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid Grid.Column="0">
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="160"/>
             </Grid.ColumnDefinitions>
-        </Grid>
-
-        <StackPanel Orientation="Horizontal">
-            <Border Width="60" Height="35"
-                        BorderBrush="Gray" VerticalAlignment="Bottom">
+            <Border Height="35">
                 <Border.Background>
                     <SolidColorBrush Color="#353535"/>
                 </Border.Background>
-                <TextBlock FontSize="14" Foreground="White" VerticalAlignment="Center" 
+                <TextBlock FontSize="16" Foreground="White" VerticalAlignment="Center" 
                                HorizontalAlignment="Center" Text="Home"/>
 
                 <i:Interaction.Triggers>
@@ -104,43 +107,141 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Border>
-            <Border Width="30">
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
-            </Border>
-        </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <ListBox ItemsSource="{Binding Tabs}" x:Name="TopMenuTabs" SelectedItem="{Binding SelectedTab}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto" Style="{StaticResource List}"
+                         HorizontalContentAlignment="Stretch" Background="{x:Null}" BorderBrush="{x:Null}" 
+                         Foreground="#DDFFFFFF" VerticalAlignment="Center">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="50*"/>
-                <ColumnDefinition Width="25*"/>
-            </Grid.ColumnDefinitions>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding TabTitle}" Width="90"
+                                        Foreground="White" Padding="5 0" TextAlignment="Center" FontSize="16">
+                                         <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseDown">
+                                                    <i:InvokeCommandAction 
+                                                        Command="{Binding DataContext.ChangeTab, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                                                        CommandParameter="{Binding SelectedTabIndex}"
+                                                        />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <!--<Button Command="{Binding DataContext.AddTab, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                                      IsEnabled="{Binding DataContext.ControlsEnabled, 
+                                        RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                      Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                      ToolTip="MaterialDesignIconForegroundButton">
+                                                                            <materialDesign:PackIcon
+                                        Kind="Play" />
+                                    </Button>-->
+                                    <TextBlock Foreground="White" VerticalAlignment="Center" FontSize="16" Text="+">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseDown">
+                                                <i:InvokeCommandAction 
+                                                    Command="{Binding DataContext.AddTab, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                                                    CommandParameter="{Binding Chat}"
+                                                    />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        <!--<TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="" Value="">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>-->
+                                    </TextBlock>
+                                </StackPanel>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="50"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="IsSelected" Value="False"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <ContentPresenter />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <!--<ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                            
+                        </Style>
+                    </ListBox.ItemContainerStyle>-->
+                </ListBox>
+            </StackPanel>
+        </Grid>
 
-            <StackPanel Orientation="Horizontal" x:Name="SelectFriendsOrChats" Grid.Row="0" Grid.Column="0">
-                <TextBlock x:Name="Chats" Text="Chats" Width="100" TextAlignment="Center"
+        <TabControl Grid.Row="1" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" TabStripPlacement="Top">
+            <TabControl.Resources>
+                <Style TargetType="TabControl">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabControl">
+                                <Grid>
+                                    <TabPanel Visibility="Hidden" Height="0"
+                                      IsItemsHost="True"/>
+                                    <Border>
+                                        <ContentPresenter ContentSource="SelectedContent"/>
+                                    </Border>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25*"/>
+                            <ColumnDefinition Width="50*"/>
+                            <ColumnDefinition Width="25*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" x:Name="SelectFriendsOrChats" Grid.Row="0" Grid.Column="0">
+                            <TextBlock x:Name="Chats" Text="Chats" Width="100" TextAlignment="Center"
                         VerticalAlignment="Center" HorizontalAlignment="Center"
                         Foreground="White" FontSize="16">
 
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Opacity" Value="0.4"/>
-                            <Setter Property="IsEnabled" Value="True"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Opacity" Value="1"/>
-                                </Trigger>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Opacity" Value="0.4"/>
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Opacity" Value="1"/>
+                                            </Trigger>
 
-                                <DataTrigger Binding="{Binding SelectedMenu}" Value="0">
-                                    <Setter Property="Opacity" Value="1"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
+                                            <DataTrigger Binding="{Binding SelectedMenu}" Value="0">
+                                                <Setter Property="Opacity" Value="1"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDown">
                             <i:InvokeCommandAction 
@@ -149,29 +250,29 @@
                                 />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </TextBlock>
+                            </TextBlock>
 
-                <Grid Background="Black" Width="1" Height="30" Opacity="0.4">
-                    <CheckBox Visibility="Hidden" x:Name="SelectMenu" IsChecked="False">
+                            <Grid Background="Black" Width="1" Height="30" Opacity="0.4">
+                                <CheckBox Visibility="Hidden" x:Name="SelectMenu" IsChecked="False">
 
-                    </CheckBox>
-                </Grid>
+                                </CheckBox>
+                            </Grid>
 
-                <TextBlock x:Name="Friends" Text="Friends" Width="100" TextAlignment="Center"
+                            <TextBlock x:Name="Friends" Text="Friends" Width="100" TextAlignment="Center"
                         VerticalAlignment="Center" HorizontalAlignment="Center"
                         Foreground="White" FontSize="16" >
 
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Opacity" Value="0.4"/>
-                            <Setter Property="IsEnabled" Value="True"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Opacity" Value="1"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Opacity" Value="0.4"/>
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Opacity" Value="1"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDown">
                             <i:InvokeCommandAction 
@@ -180,47 +281,47 @@
                                 />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </TextBlock>
-            </StackPanel>
+                            </TextBlock>
+                        </StackPanel>
 
-            <Grid x:Name="TitleMenu" HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
+                        <Grid x:Name="TitleMenu" HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Width="100">
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
+                            <Border Grid.Column="0" Width="100">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
                                FontSize="18" Text="Add" >
-                        <TextBlock.Foreground>
-                            <SolidColorBrush Color="White"/>
-                        </TextBlock.Foreground>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Opacity" Value="0.4"/>
-                                <Style.Triggers>
-                                    <EventTrigger RoutedEvent="MouseEnter">
-                                        <EventTrigger.Actions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetProperty="Opacity" To="1"/>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger.Actions>
-                                    </EventTrigger>
-                                    <EventTrigger RoutedEvent="MouseLeave">
-                                        <EventTrigger.Actions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetProperty="Opacity" To="0.4"/>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger.Actions>
-                                    </EventTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="White"/>
+                                    </TextBlock.Foreground>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Opacity" Value="0.4"/>
+                                            <Style.Triggers>
+                                                <EventTrigger RoutedEvent="MouseEnter">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetProperty="Opacity" To="1"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                                <EventTrigger RoutedEvent="MouseLeave">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetProperty="Opacity" To="0.4"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseDown">
                                 <i:InvokeCommandAction 
@@ -229,10 +330,10 @@
                                     />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </TextBlock>
-                </Border>
+                                </TextBlock>
+                            </Border>
 
-                <TextBox x:Name="ChatTitle" MinHeight="50" Grid.Column="1" MinWidth="20" 
+                            <TextBox x:Name="ChatTitle" MinHeight="50" Grid.Column="1" MinWidth="20" 
                          Text="{Binding Chat.Title, Mode=OneWay}" Foreground="White"
                          SelectionTextBrush="{DynamicResource LightPurpleColorBrush}"
                          FontSize="18" Background="{x:Null}" SelectionOpacity="1" 
@@ -240,42 +341,42 @@
                          VerticalAlignment="Center" AcceptsTab="True" AutoWordSelection="True"
                          FocusVisualStyle="{x:Null}" BorderThickness="0" Padding="5" AcceptsReturn="True" 
                          VerticalContentAlignment="Center">
-                    <TextBox.SelectionBrush>
-                        <SolidColorBrush Color="#FFCFAAF3" Opacity="0.4"/>
-                    </TextBox.SelectionBrush>
-                </TextBox>
+                                <TextBox.SelectionBrush>
+                                    <SolidColorBrush Color="#FFCFAAF3" Opacity="0.4"/>
+                                </TextBox.SelectionBrush>
+                            </TextBox>
 
-                <Border Grid.Column="2" Width="100">
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
+                            <Border Grid.Column="2" Width="100">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
                                FontSize="18" Text="Rename">
-                        <TextBlock.Foreground>
-                            <SolidColorBrush Color="White"/>
-                        </TextBlock.Foreground>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Opacity" Value="0.4"/>
-                                <Style.Triggers>
-                                    <EventTrigger RoutedEvent="MouseEnter">
-                                        <EventTrigger.Actions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetProperty="Opacity" To="1"/>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger.Actions>
-                                    </EventTrigger>
-                                    <EventTrigger RoutedEvent="MouseLeave">
-                                        <EventTrigger.Actions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetProperty="Opacity" To="0.4"/>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger.Actions>
-                                    </EventTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="White"/>
+                                    </TextBlock.Foreground>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Opacity" Value="0.4"/>
+                                            <Style.Triggers>
+                                                <EventTrigger RoutedEvent="MouseEnter">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetProperty="Opacity" To="1"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                                <EventTrigger RoutedEvent="MouseLeave">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetProperty="Opacity" To="0.4"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseDown">
                                 <i:InvokeCommandAction 
@@ -284,167 +385,177 @@
                                     />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </TextBlock>
-                </Border>
+                                </TextBlock>
+                            </Border>
 
-            </Grid>
+                        </Grid>
 
-            <Grid x:Name="SelectedChatMenu" Grid.Row="1" Grid.Column="0">
-                <ListView ItemsSource="{Binding Chats}" SelectedItem="{Binding Chat}" 
+                        <Grid x:Name="SelectedChatMenu" Grid.Row="1" Grid.Column="0">
+                            <ListView ItemsSource="{Binding Chats}" SelectedItem="{Binding Chat}"
+                                     materialDesign:ListBoxAssist.IsToggle="False"
+                                      materialDesign:ListBoxItemAssist.ShowSelection="True"
                           Visibility="{Binding SelectedMenu, Converter={StaticResource ChangeTypeMenu}, ConverterParameter=0}"
                           BorderBrush="{x:Null}" FontSize="20" Background="{x:Null}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid HorizontalAlignment="Right">
-                                <TextBlock TextAlignment="Left" Foreground="White" Text="{Binding Title}" TextWrapping="Wrap"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid HorizontalAlignment="Right">
+                                            <TextBlock TextAlignment="Left" Foreground="White" Text="{Binding Title}" TextWrapping="Wrap"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
 
-                <ListView ItemsSource="{Binding Friends}" 
+                            <ListView ItemsSource="{Binding Friends}" 
                           Visibility="{Binding SelectedMenu, Converter={StaticResource ChangeTypeMenu}, ConverterParameter=1}"
                           BorderBrush="{x:Null}" FontSize="20" Background="{x:Null}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid HorizontalAlignment="Right">
-                                <TextBlock TextAlignment="Left" Foreground="White" Text="{Binding}" TextWrapping="Wrap"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid HorizontalAlignment="Right">
+                                            <TextBlock TextAlignment="Left" Foreground="White" Text="{Binding}" TextWrapping="Wrap"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
 
-            </Grid>
-
-            <Grid Grid.Row="1" Grid.Column="1" Margin="0 0 0 50" x:Name="GridForData">
-                <recontrolls:AutoScrollListBox VerticalAlignment="Stretch" 
+                        <Grid Grid.Row="1" Grid.Column="1" Margin="0 0 0 50" x:Name="GridForData">
+                            <recontrolls:AutoScrollListBox VerticalAlignment="Stretch"
                                                ScrollViewer.VerticalScrollBarVisibility="Hidden" 
                                                ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
                                                Background="{x:Null}" BorderBrush="{x:Null}"
                                                ItemsSource="{Binding Chat.Messages}"  
-                                               Width="Auto" Height="Auto" BorderThickness="0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Border CornerRadius="15" Margin="5 4" MaxWidth="360">
-                                <Border.Background>
-                                    <SolidColorBrush Color="{StaticResource BlackColor}" Opacity="0.6"/>
-                                </Border.Background>
-                                <Border.HorizontalAlignment>
-                                    <MultiBinding Converter="{StaticResource TextAlignment}">
-                                        <Binding Path="UserID"/>
-                                        <Binding Path="DataContext.User.UserID" ElementName="GridForData"/>
-                                    </MultiBinding>
-                                </Border.HorizontalAlignment>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Width="Auto" Foreground="White" Text="{Binding Text}" 
+                                               Width="Auto" Height="Auto" BorderThickness="0" HorizontalAlignment="Right">
+                                <recontrolls:AutoScrollListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="15" Margin="5 4" MaxWidth="360">
+                                            <Border.Background>
+                                                <SolidColorBrush Color="{StaticResource BlackColor}" Opacity="0.6"/>
+                                            </Border.Background>
+                                            <Border.HorizontalAlignment>
+                                                <MultiBinding Converter="{StaticResource TextAlignment}">
+                                                    <Binding Path="Id"/>
+                                                    <Binding Path="DataContext.User.Id" ElementName="GridForData"/>
+                                                </MultiBinding>
+                                            </Border.HorizontalAlignment>
+                                            <Grid HorizontalAlignment="Right">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Width="Auto" Foreground="White" Text="{Binding Text}" 
                                            TextWrapping="Wrap" FontSize="20"
                                            Margin="10 5" HorizontalAlignment="Right"/>
-                                    <TextBlock Grid.Row="1" Opacity="0.7" Foreground="White" Padding="5 -5 5 5"
+                                                <TextBlock Grid.Row="1" Opacity="0.7" Foreground="White" Padding="5 -5 5 5"
                                            Text="{Binding SendTime, Converter={StaticResource TimeConverter}}" 
                                            HorizontalAlignment="Right"/>
-                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </recontrolls:AutoScrollListBox.ItemTemplate>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                                        <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False"/>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </recontrolls:AutoScrollListBox>
+                        </Grid>
 
-                            </Border>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </recontrolls:AutoScrollListBox>
-            </Grid>
-
-            <Border x:Name="TextMessageBoxMenu" Grid.Row="1" Background="{StaticResource BlackColorBrush}"
+                        <Border x:Name="TextMessageBoxMenu" Grid.Row="1" Background="{StaticResource BlackColorBrush}"
                     Grid.Column="1" VerticalAlignment="Bottom" Margin="0 0 0 20"
                     CornerRadius="12">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="85*"/>
-                        <ColumnDefinition Width="15*"/>
-                    </Grid.ColumnDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="85*"/>
+                                    <ColumnDefinition Width="15*"/>
+                                </Grid.ColumnDefinitions>
 
-                    <TextBox x:Name="MessageBox" MinHeight="50"
+                                <TextBox x:Name="MessageBox" MinHeight="50"
                          SelectionTextBrush="{DynamicResource LightPurpleColorBrush}"
                          FontSize="18" Background="{x:Null}" SelectionOpacity="1" 
                          BorderBrush="{x:Null}" CaretBrush="{DynamicResource LightPurpleColorBrush}"
                          VerticalAlignment="Center" AcceptsTab="True" AutoWordSelection="True" TextWrapping="Wrap"
                          FocusVisualStyle="{x:Null}" BorderThickness="0" Margin="10 0 0 0" AcceptsReturn="True" 
                          VerticalContentAlignment="Center">
-                        <TextBox.Style>
-                            <Style TargetType="{x:Type TextBox}">
-                                <Setter Property="TextBox.SelectionBrush">
-                                    <Setter.Value>
-                                        <SolidColorBrush Color="#FFCFAAF3" Opacity="0.40"/>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsFocused" Value="True">
-                                        <Setter Property="Foreground">
-                                            <Setter.Value>
-                                                <SolidColorBrush Color="White" Opacity="1"/>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Setter Property="Text" Value=""/>
-                                    </Trigger>
-                                    <Trigger Property="IsFocused" Value="False">
-                                        <Setter Property="Foreground">
-                                            <Setter.Value>
-                                                <SolidColorBrush Color="White" Opacity="0.3"/>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Setter Property="Text" Value="Send a message"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Style>
-                    </TextBox>
+                                    <TextBox.Style>
+                                        <Style TargetType="{x:Type TextBox}">
+                                            <Setter Property="TextBox.SelectionBrush">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="#FFCFAAF3" Opacity="0.40"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsFocused" Value="True">
+                                                    <Setter Property="Foreground">
+                                                        <Setter.Value>
+                                                            <SolidColorBrush Color="White" Opacity="1"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Setter Property="Text" Value=""/>
+                                                </Trigger>
+                                                <Trigger Property="IsFocused" Value="False">
+                                                    <Setter Property="Foreground">
+                                                        <Setter.Value>
+                                                            <SolidColorBrush Color="White" Opacity="0.3"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Setter Property="Text" Value="Send a message"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
 
-                    <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 10 8" Grid.Column="1" Height="32" Background="White" Width="32" CornerRadius="5">
-                        <Image Height="24" Source="/Views/icons8-отправлено-48 (1).png">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseDown">
-                                    <i:InvokeCommandAction 
+                                    </TextBox.Style>
+                                </TextBox>
+
+                                <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 10 8" Grid.Column="1" Height="32" Background="White" Width="32" CornerRadius="5">
+                                    <Image Height="24" Source="/Views/icons8-отправлено-48 (1).png">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseDown">
+                                                <i:InvokeCommandAction 
                                         Command="{Binding SendMessage}"
                                         CommandParameter="{Binding ElementName=MessageBox}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </Image>
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=MessageBox, Path=Text}" Value="">
-                                        <Setter Property="IsEnabled" Value="False"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ElementName=MessageBox, Path=Text}" Value="Send a message">
-                                        <Setter Property="IsEnabled" Value="False"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                    </Border>
-                </Grid>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Image>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=MessageBox, Path=Text}" Value="">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=MessageBox, Path=Text}" Value="Send a message">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                </Border>
+                            </Grid>
 
-            </Border>
+                        </Border>
 
-            <Grid Grid.Row="1" Grid.Column="2">
-                <Border Padding="10" CornerRadius="15" 
+                        <Grid Grid.Row="1" Grid.Column="2">
+                            <Border Padding="10" CornerRadius="15" 
                         HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0 0 0 25">
-                    <Border.Background>
-                        <SolidColorBrush Color="#FF222222" Opacity="0.6"/>
-                    </Border.Background>
-                    <TextBlock Text="Delete chat" Foreground="White" FontSize="18">
+                                <Border.Background>
+                                    <SolidColorBrush Color="#FF222222" Opacity="0.6"/>
+                                </Border.Background>
+                                <TextBlock Text="Delete chat" Foreground="White" FontSize="18">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseDown">
                                 <i:InvokeCommandAction 
                                     Command="{Binding DeleteChat}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </TextBlock>
-                </Border>
+                                </TextBlock>
+                            </Border>
 
-            </Grid>
+                        </Grid>
 
-        </Grid>
+                    </Grid>
+
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
 
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="Loaded">
@@ -454,7 +565,8 @@
                     />
             </i:EventTrigger>
         </i:Interaction.Triggers>
-
-        <!--<ContentControl Content="{Binding SelectedViewModel}"/>-->
+        <!--<Button Content="Add Tab" Grid.Row="1"  Command="{Binding AddTab}"/>-->
     </Grid>
+
+
 </UserControl>

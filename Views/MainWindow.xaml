@@ -12,6 +12,7 @@
         MouseDown="Window_MouseDown"
         xmlns:views="clr-namespace:WebChatClientApp.Views"
         xmlns:viewsmodel="clr-namespace:WebChatClientApp.ViewModels"
+        Style="{StaticResource MaterialDesignWindow}"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
 
     <Window.DataContext>

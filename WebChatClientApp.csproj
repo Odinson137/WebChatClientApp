@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Views\icons8-отправлено-48 %281%29.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MaterialDesignColors" Version="2.1.4" />
     <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.10" />
@@ -20,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Views\icons8-отправлено-48 (1).png" />
+    <Resource Include="Views\Images\icons8-отправлено-48 %281%29.png" />
   </ItemGroup>
 
 </Project>
