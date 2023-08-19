@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebChatClientApp", "WebChatClientApp.csproj", "{DE0C7C6A-5638-49CA-A315-85E0F2C05984}"
-	ProjectSection(ProjectDependencies) = postProject
-		{CE9D5F81-869C-4B45-BCA1-CC8838DEE79D} = {CE9D5F81-869C-4B45-BCA1-CC8838DEE79D}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebChatApp", "..\WebChatApp\WebChatApp.csproj", "{CE9D5F81-869C-4B45-BCA1-CC8838DEE79D}"
 EndProject

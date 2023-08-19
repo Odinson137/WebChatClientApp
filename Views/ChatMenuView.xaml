@@ -368,7 +368,7 @@
                          FontSize="18" Background="{x:Null}" SelectionOpacity="1" 
                          BorderBrush="{x:Null}" CaretBrush="{DynamicResource LightPurpleColorBrush}"
                          VerticalAlignment="Center" AcceptsTab="True" AutoWordSelection="True" TextWrapping="Wrap"
-                         FocusVisualStyle="{x:Null}" BorderThickness="0" Padding="5" AcceptsReturn="True" 
+                         FocusVisualStyle="{x:Null}" BorderThickness="0" Margin="10 0 0 0" AcceptsReturn="True" 
                          VerticalContentAlignment="Center">
                         <TextBox.Style>
                             <Style TargetType="{x:Type TextBox}">

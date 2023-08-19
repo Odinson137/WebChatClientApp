@@ -114,14 +114,13 @@
                             Background="{DynamicResource LightBlueColorBrush}" 
                             BorderBrush="{DynamicResource LightBlueColorBrush}" 
                             OpacityMask="{DynamicResource LightPurpleColorBrush}"
-                            Command="{Binding GetAuthority}" 
-                            CommandParameter="{Binding ElementName=Password, Path=Password}"/>
+                            Command="{Binding GetAuthority}"/>
 
                     <Button Grid.Column="1" Margin="10" Content="Authentication" 
                             Background="{DynamicResource LightBlueColorBrush}" 
                             BorderBrush="{DynamicResource LightBlueColorBrush}" 
                             OpacityMask="{DynamicResource LightPurpleColorBrush}"
-                            >
+                            Command="{Binding GetLogin}">
                     </Button>
 
                 </Grid>

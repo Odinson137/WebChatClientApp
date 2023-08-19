@@ -77,7 +77,7 @@ namespace WebChatClientApp.ViewModels
                         FailedPassword = "Not all data is filled in";
                     } else
                     {
-                        _context.PostRequest("User", CreateUser, GetUserId, GetFailed);
+                        _context.PostRequest("User/Registr", CreateUser, GetUserId, GetFailed);
                     }
                 }));
             }
@@ -97,6 +97,42 @@ namespace WebChatClientApp.ViewModels
         public void GetFailed(string failed)
         {
             FailedPassword = failed;
+        }
+
+
+        private Command getLogin;
+        public Command GetLogin
+        {
+            get
+            {
+                return getLogin ?? (getLogin = new Command(obj =>
+                {
+                    if (CreateUser.UserName == null || CreateUser.Password == null)
+                    {
+                        FailedPassword = "Not all data is filled in";
+                        return;
+                    }
+
+                    if (Users.Select(user => user.UserName).Contains(CreateUser.UserName))
+                    {
+                        FailedPassword = "There is already such a user";
+                        return;
+                    }
+
+                    _context.PostRequest("User/Login", CreateUser, GetUserLoginId, GetFailed);
+                }));
+            }
+        }
+
+        public void GetUserLoginId(string userId)
+        {
+            UserModel user = new UserModel()
+            {
+                Id = userId,
+                UserName = CreateUser.UserName
+            };
+            Users.Add(user);
+            FailedPassword = "Successfully added";
         }
     }
 }

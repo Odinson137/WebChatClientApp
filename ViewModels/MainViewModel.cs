@@ -21,6 +21,7 @@ namespace WebChatClientApp.ViewModels
             set
             {
                 user = value;
+                OnPropertyChanged("User");
             } 
         }
 
@@ -58,8 +59,13 @@ namespace WebChatClientApp.ViewModels
             _context.GetRequest<ObservableCollection<UserModel>>("User", CreateUserModel);
 
 
-            LoginView page = new LoginView();
-            //ChatMenuView page = new ChatMenuView();
+            //LoginView page = new LoginView();
+            ChatMenuView page = new ChatMenuView();
+            User = new UserModel()
+            {
+                Id = "9df1d71c-bdca-4532-978f-1f7423f0cddd",
+                UserName = "Kolobock"
+            };
             CurrentPage = page;
         }
 
