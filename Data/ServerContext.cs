@@ -8,7 +8,6 @@ using System.Windows;
 using System.Text;
 using System.Linq;
 using System.Net;
-using static WebChatClientApp.Data.ServerContext;
 
 namespace WebChatClientApp.Data
 {
@@ -18,37 +17,28 @@ namespace WebChatClientApp.Data
     public class ServerContext
     {
         const string url = "https://localhost:7078";
+        static string? token;
         public ServerContext() {}
+        //public ServerContext(string _token)
+        //{
+        //    token = _token;
+        //}
 
         // Метод для создания запросов к серверу
         // Должен иметь реализацию для всех случаев
         //
         // Для получения моделей из базы данных
         // adress: ../Controller/
-        public async void GetRequest<G>(string controller, GetModel<G> getModel)
+        public async Task GetRequest<G>(string controller, GetModel<G> getModel)
         {
             string apiUrl = $"{url}/api/{controller}";
-            try
-            {
-                await SendGetRequest(apiUrl, getModel);
+            await SendGetRequest(apiUrl, getModel);
         }
-            catch
-            {
-                MessageBox.Show("Error");
-            }
-}
 
         public async Task GetRequest<G>(string controller, object id, GetModel<G> getModel)
         {
             string apiUrl = $"{url}/api/{controller}/{id}";
-            try
-            {
-                await SendGetRequest(apiUrl, getModel);
-            }
-            catch
-            {
-                MessageBox.Show("Error");
-            }
+            await SendGetRequest(apiUrl, getModel);
         }
 
         // Делегат, который передает значения модели со стороны сервера из данного класса в тот класс, который его реализует
@@ -69,7 +59,9 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
-                    httpClient.DefaultRequestHeaders.Accept.Clear();
+                    //httpClient.BaseAddress = new Uri(url);
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
@@ -95,34 +87,27 @@ namespace WebChatClientApp.Data
         // Метод для создания запросов к серверу
         // Для отправки данных
         // adress: ../Controller/
-        public async void PostRequest<P>(string controller, P getModel, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
+        public async Task PostRequest<P>(string controller, P getModel, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
         {
             string apiUrl = $"{url}/api/{controller}";
-            try
-            {
-                await SendPostRequest(apiUrl, getModel, getValue, failedError);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
+            await SendPostRequest(apiUrl, getModel, getValue, failedError);
+        }
+
+        public async void PostRequestUrl(string controller, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
+        {
+            string apiUrl = $"{url}/api/{controller}";
+
+            await SendPostRequestUrl(apiUrl, getValue, failedError);
         }
 
         public async void PostRequestUrl(string controller, Dictionary<string, object> parameters, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
         {
             string apiUrl = $"{url}/api/{controller}";
-            try
-            {
-                var query = string.Join("&", parameters
-                    .Select(kvp => $"{kvp.Key}={WebUtility.UrlEncode(kvp.Value.ToString())}"));
+            var query = string.Join("&", parameters
+                .Select(kvp => $"{kvp.Key}={WebUtility.UrlEncode(kvp.Value.ToString())}"));
 
-                var fullUrl = $"{apiUrl}?{query}";
-                await SendPostRequestUrl(fullUrl, getValue, failedError);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
+            var fullUrl = $"{apiUrl}?{query}";
+            await SendPostRequestUrl(fullUrl, getValue, failedError);
         }
 
         // Метод для отправки данных на сервер
@@ -132,6 +117,11 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
+                    //if (token != null)
+                    //{
+                    //    httpClient.BaseAddress = new Uri(url);
+                    //    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    //}
                     var jsonData = JsonConvert.SerializeObject(getModel);
                     var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
@@ -170,6 +160,9 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
+                    //httpClient.BaseAddress = new Uri(url);
+                    //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                     var content = new StringContent("", Encoding.UTF8, "application/json");
 
                     var response = await httpClient.PostAsync(fullUrl, content);
@@ -207,18 +200,11 @@ namespace WebChatClientApp.Data
         public async void PutRequestUrl(string controller, Dictionary<string, object> parameters)
         {
             string apiUrl = $"{url}/api/{controller}";
-            try
-            {
-                var query = string.Join("&", parameters
-                    .Select(kvp => $"{kvp.Key}={WebUtility.UrlEncode(kvp.Value.ToString())}"));
+            var query = string.Join("&", parameters
+                .Select(kvp => $"{kvp.Key}={WebUtility.UrlEncode(kvp.Value.ToString())}"));
 
-                var fullUrl = $"{apiUrl}?{query}";
-                await SendPutRequestUrl(fullUrl);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
+            var fullUrl = $"{apiUrl}?{query}";
+            await SendPutRequestUrl(fullUrl);
         }
 
         // Метод для изменения данных на сервере по запросу
@@ -228,6 +214,9 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
+                    //httpClient.BaseAddress = new Uri(url);
+                    //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                     var content = new StringContent("", Encoding.UTF8, "application/json");
 
                     var response = await httpClient.PutAsync(fullUrl, content);
@@ -251,14 +240,7 @@ namespace WebChatClientApp.Data
         public async void DeleteRequestUrl(string controller, object id)
         {
             string apiUrl = $"{url}/api/{controller}/{id}";
-            try
-            {
-                await SendDeleteRequestUrl(apiUrl);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
+            await SendDeleteRequestUrl(apiUrl);
         }
 
         // Метод для удаления данных на сервере по запросу
@@ -268,6 +250,10 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
+              
+                    //httpClient.BaseAddress = new Uri(url);
+                    //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                     var response = await httpClient.DeleteAsync(fullUrl);
                     if (!response.IsSuccessStatusCode)
                     {

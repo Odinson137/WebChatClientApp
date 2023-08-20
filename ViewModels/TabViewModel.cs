@@ -28,6 +28,18 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
+        private UserModel addUser;
+        public UserModel AddUser
+        {
+            get => addUser;
+            set
+            {
+                addUser = value;
+                OnPropertyChanged(nameof(AddUser));
+            }
+        }
+
+
         private ChatModel chat;
         public ChatModel Chat
         {
@@ -85,7 +97,6 @@ namespace WebChatClientApp.ViewModels
             }
             set
             {
-                
                 OnPropertyChanged(nameof(TabTitle));
             }
         }
@@ -96,26 +107,14 @@ namespace WebChatClientApp.ViewModels
             _context = context;
 
             Chats = chats;
-            Chat = Chats[0];
+            if (Chats.Count > 0)
+                Chat = Chats[0];
 
             User = user;
+            AddUser = new UserModel();
 
             SelectedTabIndex = index;
         }
-
-        //public TabViewModel(string a)
-        //{
-        //    MessageBox.Show(a);
-        //}
-
-        //public void CreateChat(ObservableCollection<ChatModel> models)
-        //{
-        //    //Chats = models;
-        //    if (Chats.Count > 0)
-        //    {
-        //        Chat = Chats[0];
-        //    }
-        //}
 
         private async Task GetMessages()
         {
@@ -125,18 +124,6 @@ namespace WebChatClientApp.ViewModels
         {
             Chat.Messages = messages;
         }
-
-        //private async Task OnReceiveMessage(int userSendId, int chatSendId, string sendMessage)
-        //{
-        //    await Application.Current.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        Chat.Messages.Add(new MessageModel()
-        //        {
-        //            Text = sendMessage
-        //        });
-        //    });
-        //}
-
 
         private Command sendMessage;
         public Command SendMessage
@@ -254,6 +241,28 @@ namespace WebChatClientApp.ViewModels
                     OnPropertyChanged("SelectedMenu");
                 }));
             }
+        }
+
+        private Command addUserToChat;
+        public Command AddUserToChat
+        {
+            get
+            {
+                return addUserToChat ?? (addUserToChat = new Command(obj =>
+                {
+                    _context.PostRequestUrl($"Chat/{Chat.ChatId}/{AddUser.UserName}", SuccessfullyPostSend, FailPostSend);
+                }));
+            }
+        }
+
+        public void SuccessfullyPostSend(string message)
+        {
+            MessageBox.Show(message);
+        }
+
+        public void FailPostSend(string error)
+        {
+            MessageBox.Show(error);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -3,33 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using WebChatClientApp.Commands;
 using WebChatClientApp.Data;
-using WebChatClientApp.Models;
 using WebChatClientApp.Models.DTO;
+using WebChatClientApp.Services;
 
 namespace WebChatClientApp.ViewModels
 {
     public class LoginViewModel : BaseViewModel
     {
         private ServerContext _context;
+        private UserCredentialsService _cryptUser;
 
-        private UserModel user;
-        public UserModel User
+        private User createUser;
+        public User CreateUser
         {
-            get => user;
+            get => createUser;
             set
             {
-                user = value;
-                OnPropertyChanged("User");
+                createUser = value;
+                OnPropertyChanged(nameof(CreateUser));
             }
         }
 
-        public User CreateUser { get; set; }
-
-        private ObservableCollection<UserModel> users;
-        public ObservableCollection<UserModel> Users
+        private ObservableCollection<User> users;
+        public ObservableCollection<User> Users
         {
             get => users;
             set
@@ -43,15 +41,10 @@ namespace WebChatClientApp.ViewModels
         {
             _context = new ServerContext();
 
-            _context.GetRequest<ObservableCollection<UserModel>>("User", CreateUserModel);
             CreateUser = new User();
-        }
 
-        public delegate void UserViewModelDelegate();
-
-        private void CreateUserModel(ObservableCollection<UserModel> users)
-        {
-            Users = users;
+            _cryptUser = new UserCredentialsService();
+            Users = new ObservableCollection<User>(_cryptUser.GetUsers());
         }
 
         private string failedPassword = "";
@@ -77,21 +70,10 @@ namespace WebChatClientApp.ViewModels
                         FailedPassword = "Not all data is filled in";
                     } else
                     {
-                        _context.PostRequest("User/Registr", CreateUser, GetUserId, GetFailed);
+                        _context.PostRequest("User/Registr", CreateUser, GetUserLoginId, GetFailed);
                     }
                 }));
             }
-        }
-
-        public void GetUserId(string userId)
-        {
-            UserModel user = new UserModel()
-            {
-                Id = userId,
-                UserName = CreateUser.UserName
-            };
-            Users.Add(user);
-            FailedPassword = "Successfully created";
         }
 
         public void GetFailed(string failed)
@@ -107,32 +89,36 @@ namespace WebChatClientApp.ViewModels
             {
                 return getLogin ?? (getLogin = new Command(obj =>
                 {
-                    if (CreateUser.UserName == null || CreateUser.Password == null)
-                    {
-                        FailedPassword = "Not all data is filled in";
-                        return;
-                    }
-
-                    if (Users.Select(user => user.UserName).Contains(CreateUser.UserName))
-                    {
-                        FailedPassword = "There is already such a user";
-                        return;
-                    }
-
-                    _context.PostRequest("User/Login", CreateUser, GetUserLoginId, GetFailed);
+                    GetLoginFunc();
                 }));
             }
         }
 
+        private async void GetLoginFunc()
+        {
+            //_cryptUser.RemoveUserByUsername(_cryptUser.GetUsers().Select(x => x.UserName).FirstOrDefault());
+            if (CreateUser.UserName == null || CreateUser.Password == null)
+            {
+                FailedPassword = "Not all data is filled in";
+                return;
+            }
+
+            if (Users.Select(user => user.UserName).Contains(CreateUser.UserName))
+            {
+                FailedPassword = "There is already such a user";
+                return;
+            }
+
+            await _context.PostRequest("User/Login", CreateUser, GetUserLoginId, GetFailed);
+            
+        }
+
         public void GetUserLoginId(string userId)
         {
-            UserModel user = new UserModel()
-            {
-                Id = userId,
-                UserName = CreateUser.UserName
-            };
-            Users.Add(user);
+            _cryptUser.AddUser(CreateUser);
             FailedPassword = "Successfully added";
+            Users.Add(CreateUser);
+
         }
     }
 }

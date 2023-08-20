@@ -134,7 +134,8 @@
 
                 <ListBox ItemsSource="{Binding Users}" Background="{x:Null}" x:Name="ListBox"
                              BorderBrush="{x:Null}" Foreground="#FFFFF9F9"
-                             SelectedItem="{Binding User}" HorizontalAlignment="Center">
+                             SelectedItem="{Binding CreateUser}"
+                             HorizontalAlignment="Center">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -142,15 +143,21 @@
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-
+                </ListBox>
+                <Button Margin="0 20" Width="100" Content="Log in"
+                          Style="{StaticResource MaterialDesignRaisedLightButton}"
+                          ToolTip="Resource name: MaterialDesignRaisedLightButton" 
+                        Background="{DynamicResource LightBlueColorBrush}" 
+                        BorderBrush="{DynamicResource LightBlueColorBrush}" 
+                        Foreground="#DDFFFFFF" Cursor="Hand">
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SelectionChanged">
+                        <i:EventTrigger EventName="Click">
                             <i:InvokeCommandAction 
                                     Command="{Binding DataContext.SwitchToPage2Command, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                    CommandParameter="{Binding ElementName=ListBox, Path=SelectedItem}" />
+                                    CommandParameter="{Binding CreateUser}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </ListBox>
+                </Button>
             </StackPanel>
         </Grid>
 

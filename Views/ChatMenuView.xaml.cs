@@ -24,12 +24,6 @@ namespace WebChatClientApp.Views
         //public static readonly DependencyProperty ParameterProperty =
         //    DependencyProperty.Register("Parameter", typeof(UserModel), typeof(ChatMenuView));
 
-        //public UserModel Parameter
-        //{
-        //    get { return (UserModel)GetValue(ParameterProperty); }
-        //    set { SetValue(ParameterProperty, value); }
-        //}
-
 
         public ChatMenuView()
         {

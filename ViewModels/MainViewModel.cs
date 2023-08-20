@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,6 +8,7 @@ using System.Windows.Input;
 using WebChatClientApp.Commands;
 using WebChatClientApp.Data;
 using WebChatClientApp.Models;
+using WebChatClientApp.Models.DTO;
 using WebChatClientApp.Views;
 
 namespace WebChatClientApp.ViewModels
@@ -28,16 +31,16 @@ namespace WebChatClientApp.ViewModels
             } 
         }
 
-        private ObservableCollection<UserModel> users;
-        public ObservableCollection<UserModel> Users
-        {
-            get => users;
-            set
-            {
-                users = value;
-                OnPropertyChanged("Users");
-            }
-        }
+        //private ObservableCollection<UserModel> users;
+        //public ObservableCollection<UserModel> Users
+        //{20.
+        //    get => users;
+        //    set
+        //    {
+        //        users = value;
+        //        OnPropertyChanged("Users");
+        //    }
+        //}
 
         private UserControl currentPage;
         public UserControl CurrentPage
@@ -50,26 +53,11 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        private void CreateUserModel(ObservableCollection<UserModel> users)
-        {
-            Users = users;
-        }
-
         public MainViewModel()
         {
             _context = new ServerContext();
 
-            _context.GetRequest<ObservableCollection<UserModel>>("User", CreateUserModel);
-
-            User = new UserModel()
-            {
-                Id = "9df1d71c-bdca-4532-978f-1f7423f0cddd",
-                UserName = "Kolobock"
-            };
-
             LoginView page = new LoginView();
-            //ChatMenuView page = new ChatMenuView();
-
             CurrentPage = page;
         }
 
@@ -80,12 +68,35 @@ namespace WebChatClientApp.ViewModels
             {
                 return getUser ?? (getUser = new Command(obj =>
                 {
-                    User = (UserModel)obj;
-                    ChatMenuView page2 = new ChatMenuView();
-                    CurrentPage = page2;
+                    if (obj == null)
+                        return;
+
+                    SwitchPage((User)obj);
                 }));
             }
         }
+
+        private async void SwitchPage(User user)
+        {
+            if (user.UserName == null || user.Password == null)
+                return;
+            User = new UserModel() { UserName = user.UserName };
+            await _context.PostRequest("User/Login", user, GetUserLoginId); // GetFailed
+            ChatMenuView page2 = new ChatMenuView();
+            CurrentPage = page2;
+        }
+
+        public void GetUserLoginId(string responseContent)
+        {
+            //JObject jsonResponse = JObject.Parse(responseContent);
+
+            //string token = jsonResponse["token"].ToString();
+            //string userId = Convert.ToString(jsonResponse["id"]);
+
+            User.Id = responseContent;
+            //User.Token = token;
+        }
+
 
         private Command switchToOne;
         public Command SwitchToPage1Command
