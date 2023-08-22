@@ -4,16 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WebChatClientApp.Views" 
-        xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d" xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:recontrolls="clr-namespace:WebChatClientApp.Views.ReControls" >
+        xmlns:recontrolls="clr-namespace:WebChatClientApp.Views.ReControls" 
+        xmlns:controllers="clr-namespace:WebChatClientApp.ViewModels"
+        xmlns:converters="clr-namespace:WebChatClientApp.Converters">
 
     <UserControl.DataContext>
         <controllers:LoginViewModel/>
     </UserControl.DataContext>
 
     <UserControl.Resources>
+        <converters:VisibleSelectedListItem x:Key="VisibleSelectedListItem"/>
+
         <Color x:Key="LightBlueColor">#268e9c</Color>
         <Color x:Key="LightPurpleColor">#cfaaf3</Color>
         <Color x:Key="TextColorBlue">#0e9eb7</Color>
@@ -24,7 +28,7 @@
         <SolidColorBrush x:Key="TextColorBrushBlue">#0e9eb7</SolidColorBrush>
         <SolidColorBrush x:Key="BlackColorBrush">#222222</SolidColorBrush>
     </UserControl.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
@@ -43,7 +47,7 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-      
+
                 <Grid Grid.Column="0" HorizontalAlignment="Right" Width="0.2" Background="Gray"></Grid>
                 <Grid Grid.Column="1" Width="50">
                     <Ellipse Width="10" Height="10" Stroke="White">
@@ -80,7 +84,11 @@
                            FontSize="20" Opacity="0.7" TextAlignment="Center" TextWrapping="Wrap"/>
 
                 <TextBox materialDesign:HintAssist.Hint="UserName"   
+                         materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource LightBlueColorBrush}"
+                         materialDesign:ColorZoneAssist.Background="{StaticResource LightPurpleColorBrush}"
                          materialDesign:HintAssist.Foreground="White"  
+                         materialDesign:ColorZoneAssist.Foreground="White"
+                         materialDesign:ColorZoneAssist.Mode="SecondaryMid"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                          Margin="0 5 0 0" FontSize="24" SelectionBrush="{DynamicResource LightPurpleColorBrush}" 
                          BorderThickness="0 0 0 2" BorderBrush="White" Text="{Binding CreateUser.UserName, 
@@ -92,7 +100,8 @@
                     </TextBox.SelectionTextBrush>
                 </TextBox>
 
-                <PasswordBox recontrolls:PasswordBoxAssistant.BindPassword="True"
+                <PasswordBox materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource LightBlueColorBrush}"
+                    recontrolls:PasswordBoxAssistant.BindPassword="True"
                              recontrolls:PasswordBoxAssistant.BoundPassword="{Binding CreateUser.Password, 
                                         Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              x:Name="Password" materialDesign:HintAssist.Hint="Password"
@@ -134,31 +143,86 @@
 
                 <ListBox ItemsSource="{Binding Users}" Background="{x:Null}" x:Name="ListBox"
                              BorderBrush="{x:Null}" Foreground="#FFFFF9F9"
-                             SelectedItem="{Binding CreateUser}"
-                             HorizontalAlignment="Center">
+                             SelectedItem="{Binding SelectedUser}" HorizontalContentAlignment="Center"
+                             >
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock FontSize="24" Foreground="{StaticResource LightBlueColorBrush}"  Text="{Binding UserName}"/>
-                            </StackPanel>
+                            <Grid Width="200">
+                                <TextBlock Width="Auto" FontSize="24" HorizontalAlignment="Center" TextAlignment="Center" 
+                                       Foreground="{StaticResource LightBlueColorBrush}"  Text="{Binding UserName}"/>
+                                <materialDesign:PackIcon Kind="PlaylistMinus" 
+                                                         Height="25" Width="25"
+                                                         HorizontalAlignment="Right"
+                                                         Foreground="{StaticResource LightPurpleColorBrush}">
+                                    <materialDesign:PackIcon.ToolTip>
+                                        <ToolTip>
+                                            Remove a user from the list
+                                        </ToolTip>
+                                    </materialDesign:PackIcon.ToolTip>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDown">
+                                            <i:InvokeCommandAction 
+                                                Command="{Binding DataContext.RemoveFromListCommand, 
+                                                RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </materialDesign:PackIcon>
+                            </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <Button Margin="0 20" Width="100" Content="Log in"
+                <Grid>
+                    <Button Margin="0 20" Width="100" Content="Log in"
                           Style="{StaticResource MaterialDesignRaisedLightButton}"
                           ToolTip="Resource name: MaterialDesignRaisedLightButton" 
                         Background="{DynamicResource LightBlueColorBrush}" 
                         BorderBrush="{DynamicResource LightBlueColorBrush}" 
                         Foreground="#DDFFFFFF" Cursor="Hand">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <i:InvokeCommandAction 
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <i:InvokeCommandAction 
                                     Command="{Binding DataContext.SwitchToPage2Command, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                     CommandParameter="{Binding CreateUser}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </Button>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=ListBox, Path=SelectedIndex}" Value="-1">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                </Grid>
+
             </StackPanel>
+            <Grid Grid.Column="1" VerticalAlignment="Bottom">
+                <Button Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                        Command="{Binding DeleteUserCommand}"
+                        Content="Delete a user" BorderBrush="{x:Null}" Cursor="Hand"
+                        Height="40" FontSize="16">
+                    <Button.Foreground>
+                        <SolidColorBrush Color="#DDFFFFFF" Opacity="0.6"/>
+                    </Button.Foreground>
+                    <Button.Background>
+                        <SolidColorBrush Color="Black" Opacity="0.15"/>
+                    </Button.Background>
+                </Button>
+
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=ListBox, Path=SelectedIndex}" Value="-1">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+            </Grid>
         </Grid>
 
     </Grid>

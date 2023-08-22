@@ -30,6 +30,7 @@
         <converters:TextAlignment x:Key="TextAlignment"/>
         <converters:TimeConverter x:Key="TimeConverter"/>
         <converters:ChangeTypeMenu x:Key="ChangeTypeMenu"/>
+        <converters:GetUserNameFromId x:Key="GetUserNameFromId"/>
 
         <Style TargetType="ListBox" x:Key="List"/>
 
@@ -106,6 +107,7 @@
                             Command="{Binding DataContext.SwitchToPage1Command, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
+
             </Border>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <ListBox ItemsSource="{Binding Tabs}" x:Name="TopMenuTabs" SelectedItem="{Binding SelectedTab}"
@@ -165,7 +167,10 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </StackPanel>
+
         </Grid>
+
+
 
         <TabControl Grid.Row="1" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" TabStripPlacement="Top">
             <TabControl.Resources>
@@ -220,14 +225,14 @@
                                         </Style.Triggers>
                                     </Style>
                                 </TextBlock.Style>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDown">
-                            <i:InvokeCommandAction 
-                                Command="{Binding ChangeMenu}"
-                                CommandParameter="0"
-                                />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                                <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDown">
+                                            <i:InvokeCommandAction 
+                                                Command="{Binding ChangeMenu}"
+                                                CommandParameter="0"
+                                                />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
                             </TextBlock>
 
                             <TextBlock x:Name="Friends" Text="Friends" Width="100" TextAlignment="Center"
@@ -306,13 +311,14 @@
                             </Border>
 
                             <TextBox x:Name="ChatTitle" MinHeight="50" Grid.Column="1" MinWidth="20" 
-                         Text="{Binding Chat.Title, Mode=OneWay}" Foreground="White"
-                         SelectionTextBrush="{DynamicResource LightPurpleColorBrush}"
-                         FontSize="18" Background="{x:Null}" SelectionOpacity="1" 
-                         BorderBrush="{x:Null}" CaretBrush="{DynamicResource LightBlueColorBrush}"
-                         VerticalAlignment="Center" AcceptsTab="True" AutoWordSelection="True"
-                         FocusVisualStyle="{x:Null}" BorderThickness="0" Padding="5" AcceptsReturn="True" 
-                         VerticalContentAlignment="Center">
+                                     materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource LightBlueColorBrush}"
+                                     Text="{Binding Chat.Title, Mode=OneWay}" Foreground="White"
+                                     SelectionTextBrush="{DynamicResource LightPurpleColorBrush}"
+                                     FontSize="18" Background="{x:Null}" SelectionOpacity="1" 
+                                     BorderBrush="{x:Null}" CaretBrush="{DynamicResource LightBlueColorBrush}"
+                                     VerticalAlignment="Center" AcceptsTab="True" AutoWordSelection="True"
+                                     FocusVisualStyle="{x:Null}" BorderThickness="0" Padding="5" AcceptsReturn="True" 
+                                     VerticalContentAlignment="Center">
                                 <TextBox.SelectionBrush>
                                     <SolidColorBrush Color="#FFCFAAF3" Opacity="0.4"/>
                                 </TextBox.SelectionBrush>
@@ -364,8 +370,6 @@
 
                         <Grid x:Name="SelectedChatMenu" Grid.Row="1" Grid.Column="0">
                             <ListView ItemsSource="{Binding Chats}" SelectedItem="{Binding Chat}"
-                                     materialDesign:ListBoxAssist.IsToggle="False"
-                                      materialDesign:ListBoxItemAssist.ShowSelection="True"
                           Visibility="{Binding SelectedMenu, Converter={StaticResource ChangeTypeMenu}, ConverterParameter=0}"
                           BorderBrush="{x:Null}" FontSize="20" Background="{x:Null}">
                                 <ListView.ItemTemplate>
@@ -408,17 +412,26 @@
                                                     <Binding Path="DataContext.User.Id" ElementName="GridForData"/>
                                                 </MultiBinding>
                                             </Border.HorizontalAlignment>
-                                            <Grid>
+                                            <Grid MinWidth="50">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition/>
                                                     <RowDefinition/>
+                                                    <RowDefinition/>
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Grid.Row="0" Width="Auto" Foreground="White" Text="{Binding Text}" 
-                                           TextWrapping="Wrap" FontSize="20"
-                                           Margin="10 5" HorizontalAlignment="Right"/>
-                                                <TextBlock Grid.Row="1" Opacity="0.7" Foreground="White" Padding="5 -5 5 5"
-                                           Text="{Binding SendTime, Converter={StaticResource TimeConverter}}" 
-                                           HorizontalAlignment="Right"/>
+                                                <TextBlock Margin="10 4 0 0" Foreground="{DynamicResource LightBlueColorBrush}" Opacity="1">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource GetUserNameFromId}">
+                                                            <Binding Path="Id"/>
+                                                            <Binding Path="DataContext.Chat.Users" ElementName="GridForData"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                                <TextBlock Grid.Row="1" Width="Auto" Foreground="White" Text="{Binding Text}" 
+                                                   TextWrapping="Wrap" FontSize="16"
+                                                   Margin="10 5" HorizontalAlignment="Right"/>
+                                                <TextBlock Grid.Row="2" Opacity="0.7" Foreground="White" Padding="5 -5 5 5"
+                                                   Text="{Binding SendTime, Converter={StaticResource TimeConverter}}" 
+                                                   HorizontalAlignment="Right"/>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
@@ -457,7 +470,8 @@
                                      BorderBrush="{x:Null}" CaretBrush="{DynamicResource LightPurpleColorBrush}"
                                      VerticalAlignment="Center" AcceptsTab="True" AutoWordSelection="True" TextWrapping="Wrap"
                                      FocusVisualStyle="{x:Null}" BorderThickness="0" Margin="10 0 0 0" AcceptsReturn="True" 
-                                     VerticalContentAlignment="Center">
+                                     VerticalContentAlignment="Center"
+                                     materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource LightBlueColorBrush}">
                                     <TextBox.SelectionBrush>
                                         <SolidColorBrush Color="#FF0078D7" Opacity="0.4"/>
                                     </TextBox.SelectionBrush>
@@ -490,13 +504,55 @@
 
                         </Border>
 
+                        <Grid x:Name="ChatMenu" Grid.Column="2" Grid.Row="0">
+                            <TextBlock Grid.Column="1" Text="Chat" Foreground="White" Opacity="0.6"
+                                       FontSize="18"
+                                       VerticalAlignment="Center" TextAlignment="Center"/>
+                            <materialDesign:PackIcon Grid.Column="1" VerticalAlignment="Center"
+                                                     HorizontalAlignment="Right" Margin="3" 
+                                                     Kind="ExitToApp" Width="36" Height="36" ToolTip="Log out of the chat"
+                                                     >
+                                <materialDesign:PackIcon.Background>
+                                    <SolidColorBrush Color="Black" Opacity="0.1"/>
+                                </materialDesign:PackIcon.Background>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction 
+                                            Command="{Binding ExitFromChat}"
+                                            />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </materialDesign:PackIcon>
+                        </Grid>
+
                         <Grid Grid.Row="1" Grid.Column="2">
                             <StackPanel>
-                                <TextBox materialDesign:HintAssist.Hint="Add a user by name" 
+                                <TextBlock Text="List of users:" 
+                                           FontSize="18" TextAlignment="Center" Background="{x:Null}">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="White" Opacity="0.8"/>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+                                <ListView ItemsSource="{Binding Chat.Users}" 
+                                          MaxHeight="300">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock TextAlignment="Left" 
+                                                        FontSize="18" 
+                                                        Text="{Binding UserName}" 
+                                                        TextWrapping="Wrap">
+                                                <TextBlock.Foreground>
+                                                    <SolidColorBrush Color="White" Opacity="0.4"/>
+                                                </TextBlock.Foreground>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <TextBox materialDesign:HintAssist.Hint="Add a user by name" Margin="0 5"
                                          FontSize="18" Foreground="White" Text="{Binding AddUser.UserName}"/>
                                 <Button Content="Add that user to chat" Foreground="White" 
                                         Background="{DynamicResource LightBlueColorBrush}"
-                                        Command="{Binding AddUserToChat}"/>
+                                        Command="{Binding AddUserToChat}" BorderBrush="{DynamicResource LightBlueColorBrush}"/>
                             </StackPanel>
                             <Border Padding="10" CornerRadius="15" 
                                 HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0 0 0 25">

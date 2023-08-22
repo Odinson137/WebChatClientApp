@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+using WebChatClientApp.Models;
+using WebChatClientApp.Models.DTO;
 
 namespace WebChatClientApp.Converters
 {
@@ -14,6 +19,47 @@ namespace WebChatClientApp.Converters
             if (values[0].ToString() == values[1].ToString())
                 return HorizontalAlignment.Right;
             return HorizontalAlignment.Left;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class GetUserNameFromId : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            string id = (string)values[0];
+            var usersTest = values[1];
+            if (usersTest is not ICollection<UserModel>)
+            {
+                return null;
+            }
+            var users = (ICollection<UserModel>)usersTest;
+            return users.Where(user => user.Id == id).First().UserName;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class VisibleSelectedListItem : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            User user = (User)values[0];
+            User selectedUser = (User)values[1];
+            if (user.UserName == selectedUser.UserName)
+            {
+                return Visibility.Visible;
+            } else
+            {
+                return Visibility.Collapsed;
+            }
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

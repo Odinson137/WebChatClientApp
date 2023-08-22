@@ -74,6 +74,7 @@ namespace WebChatClientApp.Data
                 catch (HttpRequestException ex)
                 {
                     MessageBox.Show("Ошибка при отправке запроса: " + ex.Message);
+                    Application.Current.Shutdown();
                     throw new Exception("Ошибка при отправке запроса: " + ex.Message);
                 }
                 catch (JsonException ex)
@@ -117,11 +118,6 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
-                    //if (token != null)
-                    //{
-                    //    httpClient.BaseAddress = new Uri(url);
-                    //    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                    //}
                     var jsonData = JsonConvert.SerializeObject(getModel);
                     var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
@@ -148,7 +144,14 @@ namespace WebChatClientApp.Data
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Произошла ошибка при отправке сообщения на сервер: " + ex.Message);
+                    if (failedError != null)
+                    {
+                        failedError("No connection");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Произошла ошибка при отправке запроса на сервер. Код ошибки: " + ex.Message);
+                    }
                 }
             }
         }
@@ -180,7 +183,7 @@ namespace WebChatClientApp.Data
                         if (failedError != null)
                         {
                             string responseContent = await response.Content.ReadAsStringAsync();
-                            getValue(responseContent);
+                            failedError(responseContent);
                         } else
                         {
                             MessageBox.Show("Произошла ошибка при отправке запроса на сервер. Код ошибки: " + response.StatusCode);
@@ -207,22 +210,41 @@ namespace WebChatClientApp.Data
             await SendPutRequestUrl(fullUrl);
         }
 
+        public async void PutRequestUrl(string controller, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
+        {
+            string apiUrl = $"{url}/api/{controller}";
+
+            await SendPutRequestUrl(apiUrl, getValue, failedError);
+        }
+
         // Метод для изменения данных на сервере по запросу
-        private static async Task SendPutRequestUrl(string fullUrl)
+        private static async Task SendPutRequestUrl(string fullUrl, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
         {
             using (HttpClient httpClient = new HttpClient())
             {
                 try
                 {
-                    //httpClient.BaseAddress = new Uri(url);
-                    //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                    var content = new StringContent("", Encoding.UTF8, "application/json");
-
-                    var response = await httpClient.PutAsync(fullUrl, content);
-                    if (!response.IsSuccessStatusCode)
+                    var response = await httpClient.DeleteAsync(fullUrl);
+                    if (response.IsSuccessStatusCode)
                     {
-                        MessageBox.Show("Произошла ошибка при отправке сообщения на сервер. Код ошибки: " + response.StatusCode);
+                        if (getValue != null)
+                        {
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            getValue(responseContent);
+                        }
+                    }
+                    else
+                    {
+                        if (failedError != null)
+                        {
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            failedError(responseContent);
+                        }
+                        else
+                        {
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            MessageBox.Show("Произошла ошибка при отправке запроса на сервер. Код ошибки: " + response.StatusCode);
+                        }
                     }
                 }
                 catch (HttpRequestException ex)
@@ -237,27 +259,47 @@ namespace WebChatClientApp.Data
         // Метод для создания запросов к серверу
         // Для удаления данных из базы
         // adress: ../Controller/id
-        public async void DeleteRequestUrl(string controller, object id)
+        public async Task DeleteRequestUrl(string controller, object id)
         {
             string apiUrl = $"{url}/api/{controller}/{id}";
             await SendDeleteRequestUrl(apiUrl);
         }
 
+        public async Task DeleteRequestUrl(string controller, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
+        {
+            string apiUrl = $"{url}/api/{controller}";
+
+            await SendPutRequestUrl(apiUrl, getValue, failedError);
+        }
+
+
         // Метод для удаления данных на сервере по запросу
-        private static async Task SendDeleteRequestUrl(string fullUrl)
+        private static async Task SendDeleteRequestUrl(string fullUrl, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
         {
             using (HttpClient httpClient = new HttpClient())
             {
                 try
                 {
-              
-                    //httpClient.BaseAddress = new Uri(url);
-                    //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                     var response = await httpClient.DeleteAsync(fullUrl);
-                    if (!response.IsSuccessStatusCode)
+                    if (response.IsSuccessStatusCode)
                     {
-                        MessageBox.Show("Произошла ошибка при отправке сообщения на сервер. Код ошибки: " + response.StatusCode);
+                        if (getValue != null)
+                        {
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            getValue(responseContent);
+                        }
+                    }
+                    else
+                    {
+                        if (failedError != null)
+                        {
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            failedError(responseContent);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Произошла ошибка при отправке запроса на сервер. Код ошибки: " + response.StatusCode);
+                        }
                     }
                 }
                 catch (HttpRequestException ex)

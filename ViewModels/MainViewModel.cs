@@ -25,22 +25,9 @@ namespace WebChatClientApp.ViewModels
             {
                 user = value;
                 OnPropertyChanged("User");
-                
-                //ChatMenuView page2 = new ChatMenuView();
-                //CurrentPage = page2;
             } 
         }
 
-        //private ObservableCollection<UserModel> users;
-        //public ObservableCollection<UserModel> Users
-        //{20.
-        //    get => users;
-        //    set
-        //    {
-        //        users = value;
-        //        OnPropertyChanged("Users");
-        //    }
-        //}
 
         private UserControl currentPage;
         public UserControl CurrentPage
@@ -81,7 +68,7 @@ namespace WebChatClientApp.ViewModels
             if (user.UserName == null || user.Password == null)
                 return;
             User = new UserModel() { UserName = user.UserName };
-            await _context.PostRequest("User/Login", user, GetUserLoginId); // GetFailed
+            await _context.PostRequest("User/Login", user, GetUserLoginId, GetFailed); 
             ChatMenuView page2 = new ChatMenuView();
             CurrentPage = page2;
         }
@@ -95,6 +82,12 @@ namespace WebChatClientApp.ViewModels
 
             User.Id = responseContent;
             //User.Token = token;
+        }
+
+        public void GetFailed(string responseContent)
+        {
+            MessageBox.Show("Up the server, please");
+            Application.Current.Shutdown();
         }
 
 

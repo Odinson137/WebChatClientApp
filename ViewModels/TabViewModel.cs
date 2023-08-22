@@ -243,6 +243,25 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
+        private Command exitFromChat;
+        public Command ExitFromChat
+        {
+            get
+            {
+                return exitFromChat ?? (exitFromChat = new Command(obj =>
+                {
+                    _context.PutRequestUrl($"Chat/{Chat.ChatId}/{User.UserName}", SuccessfullyExitFromChat, FailPostSend);
+                }));
+            }
+        }
+
+        public void SuccessfullyExitFromChat(string message)
+        {
+            Chat.Messages.Clear();
+            Chats.Remove(Chat);
+            Chat = null;
+        }
+
         private Command addUserToChat;
         public Command AddUserToChat
         {

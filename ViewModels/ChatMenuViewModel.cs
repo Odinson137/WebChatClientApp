@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using WebChatClientApp.Commands;
 using WebChatClientApp.Data;
 using WebChatClientApp.Models;
+using static WebChatClientApp.Data.ServerContext;
 
 namespace WebChatClientApp.ViewModels
 {
@@ -103,7 +104,8 @@ namespace WebChatClientApp.ViewModels
                 .WithUrl("https://localhost:7078/chat")
                 .Build();
 
-            connection.On<int, int, string>("OnReceiveMessage", OnReceiveMessage);
+            connection.On<string, int, string>("OnReceiveMessage", OnReceiveMessage);
+            connection.On<ChatModel>("OnReceiveInvitation", OnReceiveInvitation);
 
             await Connecting();
 
@@ -113,6 +115,11 @@ namespace WebChatClientApp.ViewModels
         public void CreateChat(ObservableCollection<ChatModel> models)
         {
             Chats = models;
+        }
+
+        public void CloseApp(string message)
+        {
+            Application.Current.Shutdown();
         }
 
         private async Task Connecting()
@@ -128,27 +135,28 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        private async Task OnReceiveMessage(int userSendId, int chatSendId, string sendMessage)
+        private async Task OnReceiveMessage(string userSendId, int chatSendId, string sendMessage)
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 var chat = Chats.Where(chat => chat.ChatId == chatSendId).First();
                 chat.Messages.Add(new MessageModel()
                 {
-                    Text = sendMessage
+                    Id = userSendId,
+                    Text = sendMessage,
+                    SendTime = DateTime.Now
                 });
             });
         }
 
-        //private async Task GetMessages()
-        //{
-        //    await _context.GetRequest<ObservableCollection<MessageModel>>("Message", Chat.ChatId, CreateMessage);
-        //}
-
-        //public void CreateMessage(ObservableCollection<MessageModel> messages)
-        //{
-        //    Chat.Messages = messages;
-        //}
+        private async Task OnReceiveInvitation(ChatModel chat)
+        {
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                chat.Messages = new ObservableCollection<MessageModel>();
+                Chats.Add(chat);
+            });
+        }
 
         private Command changeTab;
         public Command ChangeTab
