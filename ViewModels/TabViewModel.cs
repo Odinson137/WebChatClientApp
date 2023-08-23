@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,7 +44,17 @@ namespace WebChatClientApp.ViewModels
         private ChatModel chat;
         public ChatModel Chat
         {
-            get => chat;
+            get 
+            {
+                if (chat == null || chat.Title == null || chat.Title == "")
+                {
+                    chat = new ChatModel
+                    {
+                        Title = "New Chat"
+                    };
+                }
+                return chat;
+            }
             set
             {
                 chat = value;
@@ -87,13 +98,7 @@ namespace WebChatClientApp.ViewModels
         {
             get
             {
-                if (Chat != null && Chat.Title != null && Chat.Title != "")
-                {
-                    return Chat.Title;
-                } else
-                {
-                    return "New Tab";
-                }
+                return Chat.Title;
             }
             set
             {
@@ -196,6 +201,8 @@ namespace WebChatClientApp.ViewModels
             {
                 return renameChat ?? (renameChat = new Command(obj =>
                 {
+                    if (Chat.ChatId == 0) return;
+                    
                     string newTitle = (string)obj;
 
                     Chat.Title = newTitle;
@@ -243,6 +250,20 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
+        public bool VisibleChatMenu { get; set; } = false;
+        private Command visibleChatMenuCommand;
+        public Command VisibleChatMenuCommand
+        {
+            get
+            {
+                return visibleChatMenuCommand ?? (visibleChatMenuCommand = new Command(obj =>
+                {
+                    VisibleChatMenu = !VisibleChatMenu;
+                    OnPropertyChanged("VisibleChatMenu");
+                }));
+            }
+        }
+
         private Command exitFromChat;
         public Command ExitFromChat
         {
@@ -276,7 +297,7 @@ namespace WebChatClientApp.ViewModels
 
         public void SuccessfullyPostSend(string message)
         {
-            MessageBox.Show(message);
+            //MessageBox.Show(message);
         }
 
         public void FailPostSend(string error)

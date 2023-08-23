@@ -150,15 +150,13 @@
                             <Grid Width="200">
                                 <TextBlock Width="Auto" FontSize="24" HorizontalAlignment="Center" TextAlignment="Center" 
                                        Foreground="{StaticResource LightBlueColorBrush}"  Text="{Binding UserName}"/>
-                                <materialDesign:PackIcon Kind="PlaylistMinus" 
+                                <Grid HorizontalAlignment="Right" Height="30" Width="30">
+                                    <materialDesign:PackIcon Kind="PlaylistMinus" 
                                                          Height="25" Width="25"
-                                                         HorizontalAlignment="Right"
+                                                         
                                                          Foreground="{StaticResource LightPurpleColorBrush}">
-                                    <materialDesign:PackIcon.ToolTip>
-                                        <ToolTip>
-                                            Remove a user from the list
-                                        </ToolTip>
-                                    </materialDesign:PackIcon.ToolTip>
+                                    </materialDesign:PackIcon>
+
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseDown">
                                             <i:InvokeCommandAction 
@@ -166,7 +164,14 @@
                                                 RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"/>
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
-                                </materialDesign:PackIcon>
+
+                                    <Grid.ToolTip>
+                                        <ToolTip>
+                                            Remove a user from the list
+                                        </ToolTip>
+                                    </Grid.ToolTip>
+                                </Grid>
+
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

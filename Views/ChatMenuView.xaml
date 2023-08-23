@@ -9,7 +9,7 @@
       xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:converters="clr-namespace:WebChatClientApp.Converters" mc:Ignorable="d"
-              
+      xmlns:cmd="http://www.galasoft.ch/mvvmlight"
       Width="800" Height="600">
 
     <UserControl.DataContext>
@@ -31,6 +31,7 @@
         <converters:TimeConverter x:Key="TimeConverter"/>
         <converters:ChangeTypeMenu x:Key="ChangeTypeMenu"/>
         <converters:GetUserNameFromId x:Key="GetUserNameFromId"/>
+        <converters:BorderCornerConverter x:Key="BorderCornerConverter"/>
 
         <Style TargetType="ListBox" x:Key="List"/>
 
@@ -104,7 +105,8 @@
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
                         <i:InvokeCommandAction 
-                            Command="{Binding DataContext.SwitchToPage1Command, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+                            Command="{Binding DataContext.SwitchToPage1Command, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                            CommandParameter="{Binding GetConnection}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
 
@@ -402,10 +404,16 @@
                                                            Foreground="#DDFFFFFF">
                                 <recontrolls:AutoScrollListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <Border CornerRadius="15" Margin="5 5" MaxWidth="360">
+                                        <Border Margin="5 5" MaxWidth="360">
                                             <Border.Background>
                                                 <SolidColorBrush Color="{StaticResource BlackColor}" Opacity="0.6"/>
                                             </Border.Background>
+                                            <Border.CornerRadius>
+                                                <MultiBinding Converter="{StaticResource BorderCornerConverter}">
+                                                    <Binding Path="Id"/>
+                                                    <Binding Path="DataContext.User.Id" ElementName="GridForData"/>
+                                                </MultiBinding>
+                                            </Border.CornerRadius>
                                             <Border.HorizontalAlignment>
                                                 <MultiBinding Converter="{StaticResource TextAlignment}">
                                                     <Binding Path="Id"/>
@@ -471,10 +479,19 @@
                                      VerticalAlignment="Center" AcceptsTab="True" AutoWordSelection="True" TextWrapping="Wrap"
                                      FocusVisualStyle="{x:Null}" BorderThickness="0" Margin="10 0 0 0" AcceptsReturn="True" 
                                      VerticalContentAlignment="Center"
-                                     materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource LightBlueColorBrush}">
+                                     materialDesign:TextFieldAssist.UnderlineBrush="{x:Null}">
                                     <TextBox.SelectionBrush>
                                         <SolidColorBrush Color="#FF0078D7" Opacity="0.4"/>
                                     </TextBox.SelectionBrush>
+
+                                    <!--<i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="KeyDown">
+                                            <i:InvokeCommandAction 
+                                        Command="{Binding SendMessage}"
+                                                CommandParameter="{Binding ElementName=MessageBox}"
+                                        />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>-->
                                 </TextBox>
 
                                 <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 10 8" Grid.Column="1" Height="32" Background="White" Width="32" CornerRadius="5">
@@ -507,14 +524,19 @@
                         <Grid x:Name="ChatMenu" Grid.Column="2" Grid.Row="0">
                             <TextBlock Grid.Column="1" Text="Chat" Foreground="White" Opacity="0.6"
                                        FontSize="18"
-                                       VerticalAlignment="Center" TextAlignment="Center"/>
+                                       VerticalAlignment="Center" TextAlignment="Center">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction 
+                                            Command="{Binding VisibleChatMenuCommand}"
+                                            />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </TextBlock>
                             <materialDesign:PackIcon Grid.Column="1" VerticalAlignment="Center"
                                                      HorizontalAlignment="Right" Margin="3" 
                                                      Kind="ExitToApp" Width="36" Height="36" ToolTip="Log out of the chat"
                                                      >
-                                <materialDesign:PackIcon.Background>
-                                    <SolidColorBrush Color="Black" Opacity="0.1"/>
-                                </materialDesign:PackIcon.Background>
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseDown">
                                         <i:InvokeCommandAction 
@@ -525,7 +547,7 @@
                             </materialDesign:PackIcon>
                         </Grid>
 
-                        <Grid Grid.Row="1" Grid.Column="2">
+                        <Grid x:Name="ChatInfo" Grid.Row="1" Grid.Column="2">
                             <StackPanel>
                                 <TextBlock Text="List of users:" 
                                            FontSize="18" TextAlignment="Center" Background="{x:Null}">
@@ -538,9 +560,9 @@
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock TextAlignment="Left" 
-                                                        FontSize="18" 
-                                                        Text="{Binding UserName}" 
-                                                        TextWrapping="Wrap">
+                                                       FontSize="18" 
+                                                       Text="{Binding UserName}" 
+                                                       TextWrapping="Wrap">
                                                 <TextBlock.Foreground>
                                                     <SolidColorBrush Color="White" Opacity="0.4"/>
                                                 </TextBlock.Foreground>
@@ -549,7 +571,8 @@
                                     </ListView.ItemTemplate>
                                 </ListView>
                                 <TextBox materialDesign:HintAssist.Hint="Add a user by name" Margin="0 5"
-                                         FontSize="18" Foreground="White" Text="{Binding AddUser.UserName}"/>
+                                         FontSize="18" Foreground="White" Text="{Binding AddUser.UserName}"
+                                         materialDesign:TextFieldAssist.UnderlineBrush="White"/>
                                 <Button Content="Add that user to chat" Foreground="White" 
                                         Background="{DynamicResource LightBlueColorBrush}"
                                         Command="{Binding AddUserToChat}" BorderBrush="{DynamicResource LightBlueColorBrush}"/>
@@ -569,6 +592,20 @@
                                 </TextBlock>
                             </Border>
 
+
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding VisibleChatMenu}" Value="True"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
                         </Grid>
 
                     </Grid>

@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using WebChatClientApp.Models;
 using WebChatClientApp.Models.DTO;
@@ -27,6 +28,21 @@ namespace WebChatClientApp.Converters
         }
     }
 
+    public class BorderCornerConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values[0].ToString() == values[1].ToString())
+                return new CornerRadius(15, 15, 0, 15);
+            return new CornerRadius(15, 15, 15, 0);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class GetUserNameFromId : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -38,7 +54,7 @@ namespace WebChatClientApp.Converters
                 return null;
             }
             var users = (ICollection<UserModel>)usersTest;
-            return users.Where(user => user.Id == id).First().UserName;
+            return users.Where(user => user.Id == id).FirstOrDefault()?.UserName ?? "";
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -98,6 +99,8 @@ namespace WebChatClientApp.ViewModels
             {
                 return switchToOne ?? (switchToOne = new Command(obj =>
                 {
+                    var connection = (HubConnection)obj;
+                    connection.StopAsync();
                     LoginView page1 = new LoginView();
                     CurrentPage = page1;
                 }));

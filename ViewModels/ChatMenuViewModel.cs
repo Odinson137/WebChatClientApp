@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using WebChatClientApp.Commands;
 using WebChatClientApp.Data;
 using WebChatClientApp.Models;
+using WebChatClientApp.Models.DTO;
 using static WebChatClientApp.Data.ServerContext;
 
 namespace WebChatClientApp.ViewModels
@@ -16,6 +17,14 @@ namespace WebChatClientApp.ViewModels
     public class ChatMenuViewModel : BaseViewModel
     {
         private HubConnection connection;
+        public HubConnection GetConnection
+        {
+            get => connection;
+            set
+            {
+                OnPropertyChanged(nameof(GetConnection));
+            }
+        }
 
         private readonly ServerContext _context;
 
@@ -31,7 +40,6 @@ namespace WebChatClientApp.ViewModels
         }
 
         private ObservableCollection<string> titleTabs = new ObservableCollection<string>();
-
         public ObservableCollection<string> TitleTabs
         {
             get { return titleTabs; }
@@ -105,7 +113,7 @@ namespace WebChatClientApp.ViewModels
                 .Build();
 
             connection.On<string, int, string>("OnReceiveMessage", OnReceiveMessage);
-            connection.On<ChatModel>("OnReceiveInvitation", OnReceiveInvitation);
+            connection.On<int, string, ICollection<UserModel>>("OnReceiveInvitation", OnReceiveInvitation);
 
             await Connecting();
 
@@ -128,6 +136,7 @@ namespace WebChatClientApp.ViewModels
             {
                 await connection.StartAsync();
                 await connection.InvokeAsync("SendMessage", User.Id);
+                GetConnection = connection;
             }
             catch (Exception ex)    
             {
@@ -149,12 +158,20 @@ namespace WebChatClientApp.ViewModels
             });
         }
 
-        private async Task OnReceiveInvitation(ChatModel chat)
+        private async Task OnReceiveInvitation(int chatId, string title, ICollection<UserModel> users)
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                chat.Messages = new ObservableCollection<MessageModel>();
-                Chats.Add(chat);
+                var chat = new ChatModel() { ChatId = chatId, Title = title, Users = new ObservableCollection<UserModel>(users) };
+                var beChat = Chats.Where(x => x.ChatId == chatId).FirstOrDefault();
+                if (beChat != null)
+                {
+                    beChat.Users = chat.Users;
+                }
+                else
+                {
+                    Chats.Add(chat);
+                }
             });
         }
 
@@ -203,11 +220,6 @@ namespace WebChatClientApp.ViewModels
                 return loadingCommand ?? (loadingCommand = new Command(obj =>
                 {
                     User = (UserModel)obj;
-                    //User = new UserModel()
-                    //{
-                    //    Id = "9df1d71c-bdca-4532-978f-1f7423f0cddd",
-                    //    UserName = "Kolobock"
-                    //};
                     ChatMenuFunc();
                 }));
             }

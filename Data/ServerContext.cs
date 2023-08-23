@@ -8,6 +8,7 @@ using System.Windows;
 using System.Text;
 using System.Linq;
 using System.Net;
+using System.Reflection.Metadata;
 
 namespace WebChatClientApp.Data
 {
@@ -224,7 +225,8 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
-                    var response = await httpClient.DeleteAsync(fullUrl);
+                    var content = new StringContent("", Encoding.UTF8, "application/json");
+                    var response = await httpClient.PutAsync(fullUrl, content);
                     if (response.IsSuccessStatusCode)
                     {
                         if (getValue != null)

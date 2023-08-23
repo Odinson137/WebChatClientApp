@@ -31,7 +31,8 @@ namespace WebChatClientApp.ViewModels
         {
             get
             {
-                CreateUser = new User { UserName = selectedUser.UserName, Password = selectedUser.Password };
+                if (selectedUser != null) 
+                    CreateUser = new User { UserName = selectedUser.UserName, Password = selectedUser.Password };
                 return selectedUser;
             }
             set
@@ -57,7 +58,7 @@ namespace WebChatClientApp.ViewModels
             _context = new ServerContext();
 
             CreateUser = new User();
-            selectedUser = new User();
+            SelectedUser = new User();
 
             _cryptUser = new UserCredentialsService();
             Users = new ObservableCollection<User>(_cryptUser.GetUsers());
@@ -79,6 +80,7 @@ namespace WebChatClientApp.ViewModels
         {
             get
             {
+                SelectedUser = null;
                 return getAuthority ?? (getAuthority = new Command(obj =>
                 {
                     if (CreateUser.UserName == null || CreateUser.Password == null)
@@ -112,6 +114,7 @@ namespace WebChatClientApp.ViewModels
 
         private async void GetLoginFunc()
         {
+            SelectedUser = null;
             if (CreateUser.UserName == null || CreateUser.Password == null)
             {
                 FailedPassword = "Not all data is filled in";
@@ -131,7 +134,11 @@ namespace WebChatClientApp.ViewModels
         {
             _cryptUser.AddUser(CreateUser);
             FailedPassword = "Successfully added";
+            //Users = new ObservableCollection<User>(_cryptUser.GetUsers());
             Users.Add(new User { UserName = CreateUser.UserName, Password = CreateUser.Password });
+            CreateUser = new User();
+            SelectedUser = new User();
+
         }
 
         private Command deleteUserCommand;
@@ -151,10 +158,12 @@ namespace WebChatClientApp.ViewModels
             await _context.DeleteRequestUrl($"User/{CreateUser.UserName}", DeleteUserFunc);
         }
 
-        public void DeleteUserFunc(string userId)
+        public void DeleteUserFunc(string message)
         {
             FailedPassword = "Successfully deleted";
+            _cryptUser.RemoveUserByUsername(SelectedUser.UserName);
             Users.Remove(SelectedUser);
+            CreateUser = new User();
         }
 
         private Command removeFromListCommand;
