@@ -18,6 +18,7 @@ namespace WebChatClientApp
         public MainWindow()
         {
             InitializeComponent();
+            Application.Current.MainWindow.ResizeMode = ResizeMode.NoResize;
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -28,10 +29,10 @@ namespace WebChatClientApp
             }
         }
 
-        //private void MiniMized_Click(object sender, RoutedEventArgs e)
-        //{
-        //    WindowState = WindowState.Minimized;
-        //}
+        private void MiniMized_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.MainWindow.WindowState = WindowState.Minimized;
+        }
 
         private void Closed_Click(object sender, RoutedEventArgs e)
         {
@@ -40,6 +41,7 @@ namespace WebChatClientApp
 
         //private void FullWindow_Click(object sender, RoutedEventArgs e)
         //{
+        //    Application.Current.MainWindow.WindowState = WindowState.Maximized;
 
         //}
     }

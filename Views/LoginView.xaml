@@ -34,12 +34,12 @@
             <RowDefinition Height="35"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid>
+        <!--<Grid>
             <Grid.Background>
                 <SolidColorBrush Color="{StaticResource BlackColor}"/>
             </Grid.Background>
-        </Grid>
-        <Grid>
+        </Grid>-->
+        <!--<Grid>
             <Grid HorizontalAlignment="Right">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -67,7 +67,8 @@
                     </Ellipse>
                 </Grid>
             </Grid>
-        </Grid>
+        
+        </Grid>-->
 
 
         <Grid Grid.Row="1">
@@ -150,6 +151,7 @@
                             <Grid Width="200">
                                 <TextBlock Width="Auto" FontSize="24" HorizontalAlignment="Center" TextAlignment="Center" 
                                        Foreground="{StaticResource LightBlueColorBrush}"  Text="{Binding UserName}"/>
+                                
                                 <Grid HorizontalAlignment="Right" Height="30" Width="30">
                                     <materialDesign:PackIcon Kind="PlaylistMinus" 
                                                          Height="25" Width="25"
@@ -170,6 +172,27 @@
                                             Remove a user from the list
                                         </ToolTip>
                                     </Grid.ToolTip>
+
+                                    <!--<Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding VisibleChatMenu}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>-->
+
+                                    <Grid.Visibility>
+                                        <MultiBinding Converter="{StaticResource VisibleSelectedListItem}">
+                                            <Binding Path="UserName"/>
+                                            <Binding Path="DataContext.SelectedUser" ElementName="ListBox"/>
+                                        </MultiBinding>
+                                    </Grid.Visibility>
                                 </Grid>
 
                             </Grid>

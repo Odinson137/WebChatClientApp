@@ -67,9 +67,9 @@ namespace WebChatClientApp.Converters
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            User user = (User)values[0];
-            User selectedUser = (User)values[1];
-            if (user.UserName == selectedUser.UserName)
+            string user = (string)values[0];
+            User? selectedUser = values[1] as User;
+            if (selectedUser != null && user == selectedUser.UserName)
             {
                 return Visibility.Visible;
             } else

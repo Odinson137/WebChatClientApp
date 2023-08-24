@@ -62,44 +62,28 @@
                 </Grid>
 
                 <Grid>
-                <!--<StackPanel Orientation="Horizontal">
-                    <Border Width="60" Height="35"
-                        BorderBrush="Gray" VerticalAlignment="Bottom">
-                        <Border.Background>
-                            <SolidColorBrush Color="#353535"/>
-                        </Border.Background>
-                            <TextBlock FontSize="14" Foreground="White" VerticalAlignment="Center" 
-                               HorizontalAlignment="Center" Text="Home"/>
-
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction 
-                                    Command="{Binding SwitchToPage1Command}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </Border>
-                    --><!--<Border Width="30">
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="White">+</TextBlock>
-                    </Border>--><!--
-                </StackPanel>-->
                     <Grid HorizontalAlignment="Right">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
-                            <ColumnDefinition/>
+                            <!--<ColumnDefinition/>-->
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0" HorizontalAlignment="Right" Width="0.2" Background="Gray"></Grid>
                         <Grid Grid.Column="1" Width="50">
-                            <Ellipse Width="10" Height="10" Stroke="White">
+                            <Ellipse Width="10" Height="10" Stroke="White" Cursor="Hand" MouseDown="MiniMized_Click">
                                 <Ellipse.Fill>
                                     <SolidColorBrush Color="{StaticResource BlackColor}"/>
                                 </Ellipse.Fill>
                             </Ellipse>
                         </Grid>
-                        <Grid Width="50" Grid.Column="2">
-                            <Ellipse Width="10" Height="10" Stroke="White"></Ellipse>
-                        </Grid>
+                        <!--<Grid Width="50" Grid.Column="2">
+                            <Ellipse Width="10" Height="10" Stroke="White" Cursor="Hand" MouseDown="FullWindow_Click">
+                                <Ellipse.Fill>
+                                    <SolidColorBrush Color="{StaticResource BlackColor}"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                        </Grid>-->
                         <Grid Width="50" Grid.Column="3" >
                             <Ellipse Width="10" Height="10" Stroke="White" Cursor="Hand" MouseDown="Closed_Click">
                                 <Ellipse.Fill>
