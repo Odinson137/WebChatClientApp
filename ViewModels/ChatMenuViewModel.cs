@@ -26,7 +26,7 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        private readonly ServerContext _context;
+        public ServerContext _context;
 
         private ObservableCollection<TabViewModel> tabs = new ObservableCollection<TabViewModel>();
         public ObservableCollection<TabViewModel> Tabs
@@ -99,14 +99,17 @@ namespace WebChatClientApp.ViewModels
 
         public ChatMenuViewModel()
         {
-            _context = new ServerContext();
+            //_context = new ServerContext();
             Chats = new ObservableCollection<ChatModel>();
         }
 
         private async void ChatMenuFunc()
         {
-            
-            await _context.GetRequest<ObservableCollection<ChatModel>>("Chat", User.Id, CreateChat);
+            var sharedData = MultyPagesSingleton.Instance;
+            User = sharedData.GetModel();
+            _context = sharedData.Context;
+
+            await _context.GetRequest<ObservableCollection<ChatModel>>($"Chat/{User.Id}", CreateChat);
 
             connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:7078/chat")

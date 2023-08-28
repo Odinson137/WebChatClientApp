@@ -19,15 +19,40 @@ public class UserCredentialsService
     public UserCredentialsService()
     {
         _filePath = "UsersData/users.json";
-        _encryptionKey = Environment.GetEnvironmentVariable("WebChatAppSecretKey");
-
+        _encryptionKey = "hjaUixTgAuENG0oT0L36cY2ZZuqvhqNLlFC6i/xPC18=";
+        //_encryptionKey = Environment.GetEnvironmentVariable("WebChatAppSecretKey");
         string directoryPath = Path.GetDirectoryName(_filePath);
+
+        //if (_encryptionKey == null )
+        //{
+        //    _encryptionKey = GenerateRandomKey(32);
+        //    Environment.SetEnvironmentVariable("Test", _encryptionKey);
+        //    if (!Directory.Exists(directoryPath))
+        //    {
+        //        Directory.CreateDirectory(directoryPath);
+        //    } else
+        //    {
+        //        File.Delete(_filePath);
+        //    }
+        //}
+
         if (!Directory.Exists(directoryPath))
         {
             Directory.CreateDirectory(directoryPath);
         }
 
         LoadUsers();
+    }
+
+
+    public static string GenerateRandomKey(int length)
+    {
+        using (var rng = new RNGCryptoServiceProvider())
+        {
+            var bytes = new byte[length];
+            rng.GetBytes(bytes);
+            return Convert.ToBase64String(bytes);
+        }
     }
 
     private void LoadUsers()
@@ -40,7 +65,6 @@ public class UserCredentialsService
         }
         else
         {
-            //_encryptionKey = GenerateAndSetSecretKey();
             _users = new List<User>();
         }
     }

@@ -30,8 +30,8 @@ namespace WebChatClientApp.ViewModels
         }
 
 
-        private UserControl currentPage;
-        public UserControl CurrentPage
+        private BaseViewModel currentPage;
+        public BaseViewModel CurrentPage
         {
             get { return currentPage; }
             set
@@ -45,7 +45,7 @@ namespace WebChatClientApp.ViewModels
         {
             _context = new ServerContext();
 
-            LoginView page = new LoginView();
+            var page = new LoginViewModel();
             CurrentPage = page;
         }
 
@@ -69,23 +69,29 @@ namespace WebChatClientApp.ViewModels
             if (user.UserName == null || user.Password == null)
                 return;
             User = new UserModel() { UserName = user.UserName };
-            await _context.PostRequest("User/Login", user, GetUserLoginId, GetFailed); 
-            ChatMenuView page2 = new ChatMenuView();
+            await _context.PostRequest("User/Login", user, GetUserLoginId, GetFailed, true);
+            ChatMenuViewModel page2 = new ChatMenuViewModel();
+
             CurrentPage = page2;
+            CurrentPage.UserMain = User;
+
+            var sharedData = MultyPagesSingleton.Instance;
+            sharedData.SetModel(User);
+            sharedData.Context = _context;
         }
 
-        public void GetUserLoginId(string responseContent)
+        public void GetUserLoginId(object responseContent)
         {
             //JObject jsonResponse = JObject.Parse(responseContent);
 
             //string token = jsonResponse["token"].ToString();
             //string userId = Convert.ToString(jsonResponse["id"]);
 
-            User.Id = responseContent;
+            User.Id = (string)responseContent;
             //User.Token = token;
         }
 
-        public void GetFailed(string responseContent)
+        public void GetFailed(object responseContent)
         {
             MessageBox.Show("Up the server, please");
             Application.Current.Shutdown();
@@ -101,7 +107,7 @@ namespace WebChatClientApp.ViewModels
                 {
                     var connection = (HubConnection)obj;
                     connection.StopAsync();
-                    LoginView page1 = new LoginView();
+                    LoginViewModel page1 = new LoginViewModel();
                     CurrentPage = page1;
                 }));
             }

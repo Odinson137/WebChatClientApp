@@ -123,7 +123,7 @@ namespace WebChatClientApp.ViewModels
 
         private async Task GetMessages()
         {
-            await _context.GetRequest<ObservableCollection<MessageModel>>("Message", Chat.ChatId, CreateMessage);
+            await _context.GetRequest<ObservableCollection<MessageModel>>($"Message/{Chat.ChatId}", CreateMessage);
         }
         public void CreateMessage(ObservableCollection<MessageModel> messages)
         {
@@ -187,9 +187,9 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        public void GetId(string chatId)
+        public void GetId(object chatId)
         {
-            int id = int.Parse(chatId);
+            int id = int.Parse((string)chatId);
             Chat = Chats.Last();
             Chat.ChatId = id;
         }
@@ -276,7 +276,7 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        public void SuccessfullyExitFromChat(string message)
+        public void SuccessfullyExitFromChat(object message)
         {
             Chat.Messages.Clear();
             Chats.Remove(Chat);
@@ -295,14 +295,14 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        public void SuccessfullyPostSend(string message)
+        public void SuccessfullyPostSend(object message)
         {
             //MessageBox.Show(message);
         }
 
-        public void FailPostSend(string error)
+        public void FailPostSend(object error)
         {
-            MessageBox.Show(error);
+            MessageBox.Show((string)error);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

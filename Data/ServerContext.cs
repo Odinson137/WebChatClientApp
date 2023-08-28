@@ -9,6 +9,11 @@ using System.Text;
 using System.Linq;
 using System.Net;
 using System.Reflection.Metadata;
+using System.Net.Http.Json;
+using WebChatClientApp.Models.DTO;
+using Newtonsoft.Json.Linq;
+using static System.Net.WebRequestMethods;
+using static WebChatClientApp.Data.ServerContext;
 
 namespace WebChatClientApp.Data
 {
@@ -18,7 +23,7 @@ namespace WebChatClientApp.Data
     public class ServerContext
     {
         const string url = "https://localhost:7078";
-        static string? token;
+        static string Token = "";
         public ServerContext() {}
         //public ServerContext(string _token)
         //{
@@ -30,16 +35,16 @@ namespace WebChatClientApp.Data
         //
         // Для получения моделей из базы данных
         // adress: ../Controller/
+        //public async Task GetRequest<G>(string controller, GetModel<G> getModel)
+        //{
+        //    string apiUrl = $"{url}/api/{controller}";
+        //    await SendGetRequest(apiUrl, getModel);
+        //}
+
         public async Task GetRequest<G>(string controller, GetModel<G> getModel)
         {
-            string apiUrl = $"{url}/api/{controller}";
-            await SendGetRequest(apiUrl, getModel);
-        }
-
-        public async Task GetRequest<G>(string controller, object id, GetModel<G> getModel)
-        {
-            string apiUrl = $"{url}/api/{controller}/{id}";
-            await SendGetRequest(apiUrl, getModel);
+            //string apiUrl = $"{url}/api/{controller}/{id}";
+            await SendGetRequest($"{url}/api/{controller}", getModel);
         }
 
         // Делегат, который передает значения модели со стороны сервера из данного класса в тот класс, который его реализует
@@ -48,7 +53,7 @@ namespace WebChatClientApp.Data
 
         // Делегат, который принимает ответы со стороны сервера об успешности или провале добавления/обновления/удаления данных
         // является дополнительным параметром, так как не всегда важно что либо принимать со стороны сервера после отправки данных
-        public delegate void GetValueFromServer(string model);
+        public delegate void GetValueFromServer(object model);
 
         // Метод для получения результов от сервера по запросу
         // Имеет две реализации для моделей и для коллекций
@@ -60,12 +65,14 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
-                    //httpClient.BaseAddress = new Uri(url);
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                    
-                    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Token);
 
-                    HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
+                    var jsonData = JsonConvert.SerializeObject("");
+                    request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                    var response = await httpClient.SendAsync(request);
+
                     response.EnsureSuccessStatusCode();
 
                     string responseBody = await response.Content.ReadAsStringAsync();
@@ -89,10 +96,10 @@ namespace WebChatClientApp.Data
         // Метод для создания запросов к серверу
         // Для отправки данных
         // adress: ../Controller/
-        public async Task PostRequest<P>(string controller, P getModel, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
+        public async Task PostRequest<P>(string controller, P getModel, GetValueFromServer getValue = null, GetValueFromServer failedError = null, bool login = false)
         {
             string apiUrl = $"{url}/api/{controller}";
-            await SendPostRequest(apiUrl, getModel, getValue, failedError);
+            await SendPostRequest(apiUrl, getModel, getValue, failedError, login);
         }
 
         public async void PostRequestUrl(string controller, GetValueFromServer getValue = null, GetValueFromServer failedError = null)
@@ -113,22 +120,35 @@ namespace WebChatClientApp.Data
         }
 
         // Метод для отправки данных на сервер
-        public async Task SendPostRequest<P>(string apiUrl, P getModel, GetValueFromServer getValue, GetValueFromServer failedError)
+        public async Task SendPostRequest<P>(string apiUrl, P getModel, GetValueFromServer getValue, GetValueFromServer failedError, bool login = false)
         {
             using (HttpClient httpClient = new HttpClient())
             {
                 try
                 {
-                    var jsonData = JsonConvert.SerializeObject(getModel);
-                    var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Token);
 
-                    var response = await httpClient.PostAsync(apiUrl, content);
+                    var jsonData = JsonConvert.SerializeObject(getModel);
+                    request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                    var response = await httpClient.SendAsync(request);
+
                     if (response.IsSuccessStatusCode)
                     {
                         if (getValue != null)
                         {
-                            string responseContent = await response.Content.ReadAsStringAsync();
-                            getValue(responseContent);
+                            if (login == true)
+                            {
+                                var responseData = await response.Content.ReadFromJsonAsync<UserDto>();
+                                Token = responseData.Token;
+                                getValue(responseData.Id);
+                            }
+                            else
+                            {
+                                object responseContent = await response.Content.ReadAsStringAsync();
+                                getValue(responseContent);
+                            }
                         }
                     }
                     else
@@ -164,12 +184,13 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
-                    //httpClient.BaseAddress = new Uri(url);
-                    //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var request = new HttpRequestMessage(HttpMethod.Post, fullUrl);
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Token);
 
                     var content = new StringContent("", Encoding.UTF8, "application/json");
+                    request.Content = content;
 
-                    var response = await httpClient.PostAsync(fullUrl, content);
+                    var response = await httpClient.SendAsync(request);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -225,8 +246,14 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
+                    var request = new HttpRequestMessage(HttpMethod.Put, fullUrl);
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Token);
+
                     var content = new StringContent("", Encoding.UTF8, "application/json");
-                    var response = await httpClient.PutAsync(fullUrl, content);
+                    request.Content = content;
+
+                    var response = await httpClient.SendAsync(request);
+
                     if (response.IsSuccessStatusCode)
                     {
                         if (getValue != null)
@@ -282,7 +309,11 @@ namespace WebChatClientApp.Data
             {
                 try
                 {
-                    var response = await httpClient.DeleteAsync(fullUrl);
+                    var request = new HttpRequestMessage(HttpMethod.Delete, fullUrl);
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Token);
+
+                    var response = await httpClient.SendAsync(request);
+
                     if (response.IsSuccessStatusCode)
                     {
                         if (getValue != null)

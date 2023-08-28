@@ -94,9 +94,9 @@ namespace WebChatClientApp.ViewModels
             }
         }
 
-        public void GetFailed(string failed)
+        public void GetFailed(object failed)
         {
-            FailedPassword = failed;
+            FailedPassword = (string)failed;
         }
 
 
@@ -130,15 +130,13 @@ namespace WebChatClientApp.ViewModels
             await _context.PostRequest("User/Login", CreateUser, GetUserLoginId, GetFailed);
         }
 
-        public void GetUserLoginId(string userId)
+        public void GetUserLoginId(object response)
         {
-            _cryptUser.AddUser(CreateUser);
+            _cryptUser.AddUser(new User { UserName = CreateUser.UserName, Password = CreateUser.Password });
             FailedPassword = "Successfully added";
-            //Users = new ObservableCollection<User>(_cryptUser.GetUsers());
             Users.Add(new User { UserName = CreateUser.UserName, Password = CreateUser.Password });
             CreateUser = new User();
             SelectedUser = new User();
-
         }
 
         private Command deleteUserCommand;
