@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -112,7 +113,7 @@ namespace WebChatClientApp.ViewModels
             await _context.GetRequest<ObservableCollection<ChatModel>>($"Chat/{User.Id}", CreateChat);
 
             connection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:7078/chat")
+                .WithUrl($"{ApplicationData.Url}/chat")
                 .Build();
 
             connection.On<string, int, string>("OnReceiveMessage", OnReceiveMessage);

@@ -22,7 +22,7 @@ namespace WebChatClientApp.Data
     // Каждый ViewModel, которому будет необходим доступ к серверу, должен создать экземпляр этого класса
     public class ServerContext
     {
-        const string url = "https://localhost:7078";
+        const string url = ApplicationData.Url;
         static string Token = "";
         public ServerContext() {}
         //public ServerContext(string _token)
